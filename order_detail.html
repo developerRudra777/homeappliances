@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Order {{ order.order_number }} | HomeHub Delivery Tracking{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb & Header Bar (Image 3 Top) -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-2 text-muted">
+                <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none fw-semibold text-primary"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'accounts:profile' %}" class="text-decoration-none text-muted">My Account</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'orders:order_history' %}" class="text-decoration-none text-muted">Orders</a></li>
+                <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">{{ order.order_number }}</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h2 class="fw-extrabold text-dark mb-0">Order {{ order.order_number }}</h2>
+                    {% if order.status == 'CANCELLED' %}
+                        <span class="badge bg-danger-subtle text-danger small px-3 py-1 rounded-pill fw-bold">
+                            &bull; CANCELLED
+                        </span>
+                    {% else %}
+                        <span class="badge bg-success-subtle text-success small px-3 py-1 rounded-pill fw-bold">
+                            &bull; {{ order.get_status_display|upper }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="text-muted small">
+                    Placed on {{ order.created_at|date:"d M Y" }} &bull; {{ order.items.count|default:"1" }} items &bull; Arriving soon with free installation
+                </div>
+            </div>
+
+            <!-- Action Buttons (Image 3 Top-Right) -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'orders:order_invoice' order.order_number %}" target="_blank" class="btn btn-outline-dark btn-sm px-3 fw-bold rounded-pill">
+                    <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Invoice
+                </a>
+                {% if order.can_cancel %}
+                    <button type="button" class="btn btn-outline-danger btn-sm px-3 fw-bold rounded-pill" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                        <i class="bi bi-x-circle me-1"></i> Cancel Order
+                    </button>
+                {% endif %}
+                <a href="#trackingStepper" class="btn btn-dark btn-sm px-3 fw-bold rounded-pill">
+                    Track live
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if order.status == 'CANCELLED' %}
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-danger bg-opacity-10 text-danger p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="bi bi-x-circle-fill fs-4"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold mb-1 text-danger">This Order Has Been Cancelled</h5>
+                <p class="small text-muted mb-0">
+                    Cancelled on <strong>{{ order.cancelled_at|date:"d M Y, h:i A"|default:order.updated_at|date:"d M Y" }}</strong>.
+                    Reason: <em>{{ order.cancellation_reason|default:"Cancelled upon customer request" }}</em>.
+                    {% if order.is_paid %}
+                        A full refund of <strong>₹{{ order.total_amount|floatformat:0|intcomma }}</strong> has been initiated to your original payment channel (expected in 3-5 business days).
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        
+        <!-- Left Column: Delivery Status Stepper & Items (Image 3 Left) -->
+        <div class="col-lg-7">
+            
+            <!-- Delivery Status Card with Stepper -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <i class="bi bi-truck text-orange fs-4"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Delivery status</h5>
+                </div>
+
+                {% if order.status == 'CANCELLED' %}
+                    <div class="stepper-vertical mb-3">
+                        <!-- Step 1: Order placed -->
+                        <div class="stepper-step completed">
+                            <div class="stepper-step-node">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-dark small">Order placed</strong>
+                                    <span class="text-muted small">Placed on {{ order.created_at|date:"d M Y, h:i A" }}</span>
+                                </div>
+                                <span class="text-muted small" style="font-size: 0.76rem;">{{ order.created_at|date:"d M" }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Cancelled -->
+                        <div class="stepper-step active">
+                            <div class="stepper-step-node bg-danger text-white border-0">
+                                <i class="bi bi-x-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-danger small">Order Cancelled</strong>
+                                    <span class="text-muted small">{{ order.cancellation_reason|default:"Order processing stopped and inventory returned." }}</span>
+                                </div>
+                                <span class="text-danger small" style="font-size: 0.76rem;">{{ order.cancelled_at|date:"d M, h:i A"|default:"Cancelled" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 d-flex align-items-center gap-2 mt-2">
+                        <i class="bi bi-info-circle text-danger fs-5"></i>
+                        <span class="small text-dark">
+                            This shipment has been cancelled. No package will be delivered.
+                        </span>
+                    </div>
+                {% else %}
+                    <div class="stepper-vertical mb-3">
+                        
+                        <!-- Step 1: Order placed -->
+                        <div class="stepper-step completed">
+                            <div class="stepper-step-node">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-dark small">Order placed</strong>
+                                    <span class="text-muted small">Payment confirmed &bull; {{ order.get_payment_method_display }}</span>
+                                </div>
+                                <span class="text-muted small" style="font-size: 0.76rem;">{{ order.created_at|date:"d M, h:i A" }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Packed at warehouse -->
+                        <div class="stepper-step {% if order.status in 'CONFIRMED,SHIPPED,DELIVERED' %}completed{% elif order.status == 'PENDING' %}active{% else %}upcoming{% endif %}">
+                            <div class="stepper-step-node">
+                                {% if order.status in 'CONFIRMED,SHIPPED,DELIVERED' %}
+                                    <i class="bi bi-check-lg"></i>
+                                {% else %}
+                                    <div class="rounded-circle bg-white" style="width: 8px; height: 8px;"></div>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-dark small">Packed at warehouse</strong>
+                                    <span class="text-muted small">Metro appliance fulfillment center</span>
+                                </div>
+                                <span class="text-muted small" style="font-size: 0.76rem;">Estimated Next</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Shipped -->
+                        <div class="stepper-step {% if order.status in 'SHIPPED,DELIVERED' %}completed{% elif order.status == 'CONFIRMED' %}active{% else %}upcoming{% endif %}">
+                            <div class="stepper-step-node">
+                                {% if order.status in 'SHIPPED,DELIVERED' %}
+                                    <i class="bi bi-check-lg"></i>
+                                {% else %}
+                                    <div class="rounded-circle bg-white" style="width: 8px; height: 8px;"></div>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-dark small">Shipped</strong>
+                                    <span class="text-muted small">Heavy Logistics Express &bull; Tracking #HH-{{ order.order_number }}</span>
+                                </div>
+                                <span class="text-muted small" style="font-size: 0.76rem;">In Transit</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Out for delivery -->
+                        <div class="stepper-step {% if order.status == 'DELIVERED' %}completed{% elif order.status == 'SHIPPED' %}active{% else %}upcoming{% endif %}">
+                            <div class="stepper-step-node">
+                                {% if order.status == 'DELIVERED' %}
+                                    <i class="bi bi-check-lg"></i>
+                                {% else %}
+                                    <div class="rounded-circle bg-white" style="width: 8px; height: 8px;"></div>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-dark small">Out for delivery</strong>
+                                    <span class="text-muted small">Appliance technician assigned for delivery &amp; unboxing</span>
+                                </div>
+                                <span class="text-muted small" style="font-size: 0.76rem;">Expected Today</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Delivered -->
+                        <div class="stepper-step {% if order.status == 'DELIVERED' %}completed{% else %}upcoming{% endif %}">
+                            <div class="stepper-step-node">
+                                <i class="bi bi-house-door"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="d-block text-dark small">Delivered &amp; Installed</strong>
+                                    <span class="text-muted small">Doorstep delivery, live unboxing, and demo</span>
+                                </div>
+                                <span class="text-muted small" style="font-size: 0.76rem;">Expected 24-48 hrs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Installation Note Alert (Image 3 Style) -->
+                    <div class="p-3 rounded-3 bg-orange bg-opacity-10 border border-orange border-opacity-25 d-flex align-items-center gap-2 mt-2">
+                        <i class="bi bi-clock-history text-orange fs-5"></i>
+                        <span class="small text-dark">
+                            Please keep someone available at home &mdash; professional installation will be scheduled within 24 hrs of delivery.
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Items in this Order Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-bag-check text-orange fs-5"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Items in this order ({{ order.items.count|default:"1" }})</h5>
+                </div>
+
+                {% for item in order.items.all %}
+                    <div class="d-flex justify-content-between align-items-center gap-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-3 bg-light p-2 border d-flex align-items-center justify-content-center" style="width: 65px; height: 65px;">
+                                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.title }}" class="w-100 h-100 object-fit-contain">
+                            </div>
+                            <div>
+                                <strong class="d-block text-dark small">{{ item.product.title }}</strong>
+                                <div class="text-muted" style="font-size: 0.76rem;">
+                                    Energy Rating: <strong>{{ item.product.energy_rating|default:"5-Star" }}</strong> &bull; Free installation included
+                                </div>
+                                <span class="badge bg-orange bg-opacity-10 text-orange small mt-1" style="font-size: 0.68rem;">Free Installation</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted mb-1">Qty: {{ item.quantity }}</div>
+                            <strong class="fs-6 text-dark">₹{{ item.total_price|floatformat:0|intcomma }}</strong>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex justify-content-between align-items-center gap-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-3 bg-light p-2 border" style="width: 65px; height: 65px;">
+                                <img src="https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=120&auto=format&fit=crop&q=80" alt="" class="w-100 h-100 object-fit-contain">
+                            </div>
+                            <div>
+                                <strong class="d-block text-dark small">Samsung 1.5T 5★ WindFree™ split AC, AI energy</strong>
+                                <div class="text-muted" style="font-size: 0.76rem;">Copper condenser &bull; Wi-Fi &bull; VN-AC-2210</div>
+                                <span class="badge bg-orange bg-opacity-10 text-orange small mt-1" style="font-size: 0.68rem;">Free Installation Included</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted mb-1">Qty: 1</div>
+                            <strong class="fs-6 text-dark">₹{{ order.total_amount|default:"36999"|floatformat:0|intcomma }}</strong>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right Column: Price Summary & Delivery Address (Image 3 Right) -->
+        <div class="col-lg-5">
+            
+            <!-- Price Summary Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-receipt text-orange fs-5"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Price summary</h5>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Items total</span>
+                    <strong class="text-dark">₹{{ order.subtotal|default:order.total_amount|floatformat:0|intcomma }}</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Delivery</span>
+                    <strong class="text-success">FREE</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Installation</span>
+                    <strong class="text-success">FREE</strong>
+                </div>
+
+                {% if order.discount_amount > 0 %}
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Coupon Discount{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span>
+                    <strong class="text-success">- ₹{{ order.discount_amount|floatformat:0|intcomma }}</strong>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">GST (Included)</span>
+                    <span class="text-muted">18% Included</span>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="d-flex justify-content-between align-items-baseline mb-3">
+                    <span class="fw-bold fs-5 text-dark">Total paid</span>
+                    <span class="fs-3 fw-extrabold text-orange">₹{{ order.total_amount|floatformat:0|intcomma }}</span>
+                </div>
+
+                <!-- Green Paid Badge (Image 3 Style) -->
+                {% if order.is_paid %}
+                    <div class="p-2 rounded-3 bg-success-subtle text-success small fw-bold text-center mb-1">
+                        &check; Paid via {{ order.get_payment_method_display }} {% if order.upi_id %}({{ order.upi_id }}){% endif %}
+                    </div>
+                    {% if order.razorpay_payment_id %}
+                        <div class="text-center small text-muted">
+                            Razorpay Payment Ref: <code>{{ order.razorpay_payment_id }}</code>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="p-2 rounded-3 bg-warning-subtle text-warning-emphasis small fw-bold text-center mb-1">
+                        Payment Pending: {{ order.get_payment_method_display }}
+                    </div>
+                    {% if order.payment_method == 'RAZORPAY' %}
+                        <div class="text-center mt-2">
+                            <a href="{% url 'orders:razorpay_payment' order.order_number %}" class="btn btn-sm btn-primary w-100 fw-bold">
+                                <i class="bi bi-shield-lock-fill me-1"></i> Pay Now via Razorpay
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Delivery Address Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-geo-alt text-orange fs-5"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Delivery address</h5>
+                </div>
+
+                <strong class="d-block text-dark mb-1">{{ order.full_name }}</strong>
+                <p class="text-muted small mb-2" style="line-height: 1.6;">
+                    {{ order.address_line1 }}<br>
+                    {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+                    {{ order.city }} &mdash; {{ order.postal_code }}, {{ order.state }}, India
+                </p>
+                <div class="small fw-semibold text-dark">
+                    <i class="bi bi-telephone me-1 text-orange"></i> {{ order.phone }}
+                </div>
+            </div>
+
+            <!-- Need Help Card (Image 3 Bottom-Right) -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <h6 class="fw-bold text-dark mb-1">Need help with this order?</h6>
+                <p class="text-muted small mb-3">Certified technicians are standing by to assist with delivery &amp; warranty.</p>
+                <a href="tel:18001234567" class="btn btn-outline-dark btn-sm rounded-pill fw-bold px-4">
+                    Contact support
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% if order.can_cancel %}
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark" id="cancelOrderModalLabel">
+                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>Cancel Order #{{ order.order_number }}
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'orders:order_cancel' order.order_number %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body py-3">
+                    <p class="small text-muted mb-3">
+                        Are you sure you want to cancel this order? Once cancelled, appliance delivery and installation will be stopped immediately.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Reason for Cancellation <span class="text-danger">*</span></label>
+                        <select name="cancellation_reason" class="form-select form-select-sm rounded-3" required>
+                            <option value="" disabled selected>-- Select a reason --</option>
+                            <option value="Ordered by mistake">Ordered by mistake</option>
+                            <option value="Found a better price or deal elsewhere">Found a better price or deal elsewhere</option>
+                            <option value="Delivery duration is longer than expected">Delivery duration is longer than expected</option>
+                            <option value="Changed my mind / No longer needed">Changed my mind / No longer needed</option>
+                            <option value="Need to change delivery address or phone number">Need to change delivery address or phone number</option>
+                            <option value="Other reasons">Other reasons</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Additional Comments (Optional)</label>
+                        <textarea name="cancellation_comment" class="form-control form-control-sm rounded-3" rows="2" placeholder="Tell us more about why you are cancelling..."></textarea>
+                    </div>
+
+                    {% if order.is_paid %}
+                    <div class="p-2 rounded-3 bg-light border small text-muted">
+                        <i class="bi bi-shield-check text-success me-1"></i>
+                        A full refund of <strong>₹{{ order.total_amount|floatformat:0|intcomma }}</strong> will be credited back to your original payment channel within 3-5 business days.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold" data-bs-dismiss="modal">Keep My Order</button>
+                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi bi-x-circle me-1"></i> Confirm Cancellation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

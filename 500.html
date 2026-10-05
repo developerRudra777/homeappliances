@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Server Error (500) | HomeHub Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="p-5 bg-white rounded-4 shadow-sm border">
+                <div class="display-1 fw-bold text-danger mb-3">500</div>
+                <h3 class="fw-bold mb-3">Internal Server Error</h3>
+                <p class="text-muted mb-4">
+                    Something went wrong on our end while processing your request. Our technical team has been notified.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'store:home' %}" class="btn btn-primary px-4 py-2 fw-semibold">
+                        <i class="bi bi-house-door me-1"></i> Return to Safety
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

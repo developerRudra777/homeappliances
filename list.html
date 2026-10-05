@@ -1,0 +1,106 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}Customer Reviews | VoltCraft Administration{% endblock %}
+
+{% block portal_content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h4 class="fw-extrabold mb-1">⭐ Customer Reviews Moderation</h4>
+        <p class="text-muted small mb-0">Total {{ total_reviews }} verified customer reviews across all appliances</p>
+    </div>
+</div>
+
+<!-- Rating Filter Tabs -->
+<div class="d-flex gap-2 flex-wrap mb-4">
+    <a href="{% url 'admin_portal:reviews' %}" class="btn btn-sm {% if not selected_rating %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+        All Ratings
+    </a>
+    <a href="{% url 'admin_portal:reviews' %}?rating=5" class="btn btn-sm {% if selected_rating == '5' %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+        ★★★★★ (5 Stars)
+    </a>
+    <a href="{% url 'admin_portal:reviews' %}?rating=4" class="btn btn-sm {% if selected_rating == '4' %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+        ★★★★☆ (4 Stars)
+    </a>
+    <a href="{% url 'admin_portal:reviews' %}?rating=3" class="btn btn-sm {% if selected_rating == '3' %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+        ★★★☆☆ (3 Stars)
+    </a>
+    <a href="{% url 'admin_portal:reviews' %}?rating=1" class="btn btn-sm {% if selected_rating == '1' %}btn-danger{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+        ★☆☆☆☆ (Critical)
+    </a>
+</div>
+
+<!-- Reviews Table -->
+<div class="portal-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small">
+                <tr>
+                    <th class="ps-3">Customer</th>
+                    <th>Appliance</th>
+                    <th>Rating</th>
+                    <th>Feedback Headline & Comments</th>
+                    <th>Date</th>
+                    <th class="text-end pe-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rev in page_obj %}
+                    <tr>
+                        <td class="ps-3 py-3">
+                            <strong class="d-block text-dark small">{{ rev.user.first_name|default:rev.user.username }}</strong>
+                            <small class="text-muted">@{{ rev.user.username }}</small>
+                        </td>
+                        <td>
+                            <a href="{{ rev.product.get_absolute_url }}" target="_blank" class="fw-semibold text-dark text-decoration-none small d-block">
+                                {{ rev.product.title|truncatechars:35 }}
+                            </a>
+                            <small class="text-muted">{{ rev.product.brand.name }}</small>
+                        </td>
+                        <td>
+                            <div class="text-orange small text-nowrap">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rev.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                                <span class="fw-bold text-dark ms-1">({{ rev.rating }}/5)</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold small text-dark">{{ rev.headline }}</div>
+                            <small class="text-muted">{{ rev.comment|truncatechars:90 }}</small>
+                        </td>
+                        <td class="small text-muted">{{ rev.created_at|date:"M d, Y" }}</td>
+                        <td class="text-end pe-3">
+                            <a href="{% url 'admin_portal:review_delete' rev.id %}" class="btn btn-sm btn-outline-danger" title="Delete Review" onclick="return confirm('Permanently delete this customer review?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">No reviews found for this rating filter.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination pagination-sm justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}">&laquo;</a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}">{{ num }}</a>
+                </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+{% endblock %}

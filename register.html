@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Your Account | HomeHub Smart Appliances{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="container">
+        <div class="row g-4 align-items-center justify-content-center">
+            
+            <!-- Left: Smart Appliances Lifestyle Showcase (Image 5 Left) -->
+            <div class="col-lg-6 col-md-10 d-none d-lg-block">
+                <div class="pe-lg-4">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-orange bg-opacity-10 text-orange fw-bold small mb-2">
+                            <i class="bi bi-shield-check"></i> YOUR HOME, OUR PRIORITY
+                        </div>
+                        <h1 class="auth-hero-title">
+                            SMART APPLIANCES<br>
+                            <span class="text-orange">FOR A BETTER HOME</span>
+                        </h1>
+                        <p class="auth-hero-subtitle text-muted">
+                            Top Quality &bull; Best Brands &bull; Great Prices
+                        </p>
+                    </div>
+
+                    <!-- Lifestyle Appliance Visual Box -->
+                    <div class="auth-lifestyle-container">
+                        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=1000&auto=format&fit=crop&q=80" alt="Smart Home Appliances" class="img-fluid rounded-4 shadow-sm" style="max-height: 540px; width: 100%; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Floating White Card (Image 5 Right) -->
+            <div class="col-lg-5 col-md-8 col-sm-11">
+                <div class="auth-floating-card">
+                    
+                    <!-- Center Icon & Greetings -->
+                    <div class="text-center mb-4">
+                        <div class="auth-icon-badge">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <h2 class="auth-card-title">Sign In (Create Account)</h2>
+                        <p class="auth-card-subtitle">Create your HomeHub account to start shopping.</p>
+                    </div>
+
+                    <!-- Error feedback -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <div>&bull; {{ error }}</div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <div>&bull; {{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Django Form -->
+                    <form method="POST" action="{% url 'accounts:register' %}" id="registerForm">
+                        {% csrf_token %}
+
+                        <!-- Full Name Input -->
+                        <div class="auth-input-group">
+                            <label>Full Name</label>
+                            <div class="position-relative">
+                                <input type="text" name="full_name" class="auth-input-field" placeholder="Enter your full name" required value="{{ form.full_name.value|default:'' }}">
+                                <i class="bi bi-person auth-input-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Email Address Input -->
+                        <div class="auth-input-group">
+                            <label>Email Address</label>
+                            <div class="position-relative">
+                                <input type="email" name="email" class="auth-input-field" placeholder="Enter your email" required value="{{ form.email.value|default:'' }}">
+                                <i class="bi bi-envelope auth-input-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Number Input -->
+                        <div class="auth-input-group">
+                            <label>Mobile Number</label>
+                            <div class="position-relative">
+                                <input type="text" name="phone" class="auth-input-field" placeholder="Enter your mobile number" value="{{ form.phone.value|default:'' }}">
+                                <i class="bi bi-telephone auth-input-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="auth-input-group mb-2">
+                            <label>Password</label>
+                            <div class="position-relative">
+                                <input type="password" name="password1" id="regPasswordInput" class="auth-input-field" placeholder="Create a password" required>
+                                <i class="bi bi-lock auth-input-icon"></i>
+                                <i class="bi bi-eye auth-eye-toggle" id="toggleRegPassword" onclick="togglePasswordVisibility('regPasswordInput', 'toggleRegPassword')"></i>
+                            </div>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.76rem;">
+                                <i class="bi bi-check-circle text-orange me-1"></i> Use 8+ characters with letters, numbers &amp; symbols
+                            </small>
+                        </div>
+
+                        <!-- Confirm Password Input -->
+                        <div class="auth-input-group">
+                            <label>Confirm Password</label>
+                            <div class="position-relative">
+                                <input type="password" name="password2" id="regConfirmPasswordInput" class="auth-input-field" placeholder="Confirm your password" required>
+                                <i class="bi bi-lock auth-input-icon"></i>
+                                <i class="bi bi-eye auth-eye-toggle" id="toggleRegConfirmPassword" onclick="togglePasswordVisibility('regConfirmPasswordInput', 'toggleRegConfirmPassword')"></i>
+                            </div>
+                        </div>
+
+                        <!-- Terms & Conditions Checkbox -->
+                        <div class="form-check mb-3 small text-muted">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required checked>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the <a href="#" class="text-orange text-decoration-none">Terms &amp; Conditions</a> and <a href="#" class="text-orange text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <!-- Sign In / Register Button -->
+                        <button type="submit" class="auth-submit-btn">
+                            Sign In
+                        </button>
+                    </form>
+
+
+                 
+                    <!-- Login link -->
+                    <div class="text-center mt-4 small text-muted">
+                        Already have an account? 
+                        <a href="{% url 'accounts:login' %}" class="text-orange fw-bold text-decoration-none">
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horizontal Trust Perks Bar (Image 5 Bottom) -->
+        <div class="trust-strip-box">
+            <div class="row g-3 text-center">
+                <div class="col-md-3 col-6">
+                    <div class="trust-col">
+                        <div class="trust-icon-circle">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <strong>Secure Shopping</strong>
+                        <span>Your data is safe with us</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="trust-col">
+                        <div class="trust-icon-circle">
+                            <i class="bi bi-percent"></i>
+                        </div>
+                        <strong>Best Deals</strong>
+                        <span>Unbeatable prices every day</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="trust-col">
+                        <div class="trust-icon-circle">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <strong>Easy Returns</strong>
+                        <span>Hassle-free returns within 7 days</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="trust-col">
+                        <div class="trust-icon-circle">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                        <strong>Multiple Payments</strong>
+                        <span>Pay the way you like</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+</script>
+{% endblock %}

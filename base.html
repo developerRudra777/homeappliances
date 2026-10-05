@@ -1,0 +1,628 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HomeHub | Smart Appliances for a Better Home{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 & Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom Modern Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1.1">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- 1. Top Announcement Bar (Image 1 Style) -->
+    <div class="announcement-bar-top">
+        <div class="container">
+            <i class="bi bi-tag-fill me-1"></i> FESTIVE SALE IS LIVE — <span class="highlight">UP TO 45% OFF</span> ON LARGE APPLIANCES • FREE INSTALLATION
+        </div>
+    </div>
+
+    <!-- 2. Support Contact Bar (Image 3 Style) -->
+    <div class="support-header-bar d-none d-md-block">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                NEED HELP WITH YOUR ORDER? CALL US — <a href="tel:18001234567" class="fw-bold">1800-123-4567</a> (9 AM – 9 PM)
+            </div>
+            <div class="d-flex gap-4">
+                <a href="{% url 'store:product_list' %}"><i class="bi bi-tag-fill text-orange me-1"></i> Today's Deals</a>
+                <a href="{% url 'store:customer_feedback' %}"><i class="bi bi-chat-heart text-warning me-1"></i> Customer Feedback</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Main Navigation Bar -->
+    <header class="main-navbar sticky-top">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between gap-3">
+                
+                <!-- Left: Logo & Hamburger -->
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-sm d-lg-none p-0 border-0 fs-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <a class="navbar-brand m-0 p-0" href="{% url 'store:home' %}">
+                        <img src="{% static 'images/logo.svg' %}" alt="HomeHub" height="38">
+                    </a>
+                </div>
+
+                <!-- Center: Rounded Pill Search Form -->
+                <form class="header-search-form d-none d-md-block position-relative" action="{% url 'store:product_list' %}" method="GET">
+                    <div class="search-pill">
+                        <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search appliances, categories..." autocomplete="off">
+                        <button type="submit" aria-label="Search">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Right: Action Links, Profile & Cart Pill -->
+                <div class="d-flex align-items-center gap-3">
+                    
+                    <nav class="d-none d-lg-flex align-items-center gap-3 me-2">
+                        <a href="{% url 'store:home' %}" class="nav-link fw-bold px-3 py-1 rounded-pill {% if request.path == '/' %}bg-primary text-white shadow-sm{% else %}text-dark{% endif %}"><i class="bi bi-house-door-fill me-1"></i> Home</a>
+                        <a href="{% url 'store:product_list' %}" class="nav-link">Shop</a>
+                        <a href="{% url 'store:categories_list' %}" class="nav-link">Categories</a>
+                        <a href="{% url 'orders:order_history' %}" class="nav-link">Track Order</a>
+                    </nav>
+
+                    <!-- User Profile / Sign In -->
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <a class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle border" style="width: 36px; height: 36px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.95rem;">
+                                        {{ user.first_name|default:user.username|slice:":1"|upper }}
+                                    </div>
+                                {% endif %}
+                                <span class="d-none d-xl-inline small">Hi, {{ user.first_name|default:user.username }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2 p-2" style="min-width: 210px;">
+                                <li>
+                                    <div class="px-3 py-2 border-bottom mb-2">
+                                        <div class="fw-bold small text-dark">{{ user.get_full_name|default:user.username }}</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">{{ user.email }}</div>
+                                    </div>
+                                </li>
+                                <li><a class="dropdown-item py-2 rounded-3 small fw-semibold" href="{% url 'accounts:profile' %}"><i class="bi bi-person-circle me-2 text-orange"></i> My Profile</a></li>
+                                <li><a class="dropdown-item py-2 rounded-3 small fw-semibold" href="{% url 'orders:order_history' %}"><i class="bi bi-box-seam me-2 text-primary"></i> My Orders</a></li>
+                                <li><a class="dropdown-item py-2 rounded-3 small fw-semibold" href="{% url 'direct_checkout' %}"><i class="bi bi-credit-card me-2 text-success"></i> Payment Page</a></li>
+                                <li><a class="dropdown-item py-2 rounded-3 small fw-semibold" href="{% url 'store:customer_feedback' %}"><i class="bi bi-chat-heart me-2 text-warning"></i> Customer Feedback</a></li>
+                                {% if user.is_superuser %}
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><a class="dropdown-item py-2 rounded-3 small fw-bold text-orange" href="{% url 'admin_portal:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i> Admin Portal</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <form action="{% url 'accounts:logout' %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2 rounded-3 small text-danger fw-semibold"><i class="bi bi-box-arrow-right me-2"></i> Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-primary px-3 fw-bold">Login</a>
+                    {% endif %}
+
+                    <!-- Cart Pill Button (Image 1 Style: Cart • X) -->
+                    <a href="{% url 'cart:cart_detail' %}" class="cart-pill-btn">
+                        <i class="bi bi-bag"></i>
+                        <span>Cart • {{ cart|length }}</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile Always-Visible Search Bar (for mobile & small screens) -->
+            <div class="d-md-none mt-2 pt-1 pb-1">
+                <form class="mobile-search-form position-relative w-100" action="{% url 'store:product_list' %}" method="GET">
+                    <div class="search-pill">
+                        <input type="text" name="q" placeholder="Search appliances, brands (e.g. Samsung, AC)..." autocomplete="off">
+                        <button type="submit" aria-label="Search"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Mobile Collapsible Menu -->
+            <div class="collapse d-lg-none mt-2 pt-2 border-top" id="navbarCollapse">
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'store:home' %}" class="nav-link py-2 px-3 rounded-3 fw-bold {% if request.path == '/' %}bg-primary text-white{% else %}text-dark bg-light{% endif %}"><i class="bi bi-house-door-fill me-2 {% if request.path == '/' %}text-white{% else %}text-primary{% endif %}"></i> Home</a>
+                    <a href="{% url 'store:categories_list' %}" class="nav-link py-1 px-2 text-dark"><i class="bi bi-grid me-2 text-muted"></i> Categories</a>
+                    <a href="{% url 'store:product_list' %}" class="nav-link py-1 px-2 text-dark"><i class="bi bi-shop me-2 text-muted"></i> All Products</a>
+                    <a href="{% url 'cart:cart_detail' %}" class="nav-link py-1 px-2 text-dark"><i class="bi bi-bag me-2 text-muted"></i> Cart ({{ cart|length }})</a>
+                    <a href="{% url 'direct_checkout' %}" class="nav-link py-1 px-2 text-dark"><i class="bi bi-credit-card me-2 text-success"></i> Payment Page</a>
+                    <a href="{% url 'orders:order_history' %}" class="nav-link py-1 px-2 text-dark"><i class="bi bi-box-seam me-2 text-success"></i> Track Orders</a>
+                    <a href="{% url 'store:customer_feedback' %}" class="nav-link py-1 px-2 text-dark"><i class="bi bi-chat-heart me-2 text-warning"></i> Customer Feedback</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Flash Messages -->
+    <div class="container pt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center gap-2 mb-3" role="alert">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <div>{{ message }}</div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Page Content Slot -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Deep Charcoal Footer (Image 1 Style) -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row g-4 justify-content-between mb-5">
+                
+                <!-- Left Brand Info -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="rounded-3 bg-orange text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <i class="bi bi-house-door-fill fs-5"></i>
+                        </div>
+                        <span class="fs-4 fw-extrabold text-white">Home<span class="text-orange">Hub</span></span>
+                    </div>
+                    <p class="small text-secondary mb-4" style="max-width: 340px; line-height: 1.6;">
+                        Quality appliances for modern homes. Delivered, installed and supported by people who care.
+                    </p>
+                    <div class="social-icons-strip">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                        <a href="#" aria-label="X"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+
+                <!-- Column: SHOP -->
+                <div class="col-lg-2 col-6">
+                    <h6>SHOP</h6>
+                    <a href="{% url 'store:category_detail' 'kitchen-cooking' %}">Kitchen</a>
+                    <a href="{% url 'store:category_detail' 'refrigerators' %}">Refrigeration</a>
+                    <a href="{% url 'store:category_detail' 'washing-machines' %}">Laundry</a>
+                    <a href="{% url 'store:category_detail' 'air-conditioners' %}">Cooling</a>
+                    <a href="{% url 'store:categories_list' %}">All Categories</a>
+                </div>
+
+                <!-- Column: HELP -->
+                <div class="col-lg-2 col-6">
+                    <h6>HELP</h6>
+                    <a href="{% url 'orders:order_history' %}">Track Order</a>
+                    <a href="{% url 'direct_checkout' %}">Payment Options</a>
+                    <a href="{% url 'store:customer_feedback' %}">Customer Feedback</a>
+                    <a href="#">Returns & Exchanges</a>
+                    <a href="#">Warranty Claim</a>
+                    <a href="tel:18001234567">Contact Support</a>
+                </div>
+
+                <!-- Column: COMPANY -->
+                <div class="col-lg-3 col-md-6">
+                    <h6>COMPANY</h6>
+                    <a href="#">About HomeHub</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Store Locator</a>
+                    <a href="#">Appliances Blog</a>
+                    <div class="small text-secondary mt-3">
+                        <i class="bi bi-shield-check text-success me-1"></i> 256-Bit SSL Encrypted Checkout
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary border-opacity-25 my-4">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-secondary small">
+                <div>
+                    &copy; 2026 HomeHub. All rights reserved. Powered by Django.
+                </div>
+                <div class="d-flex gap-4">
+                    <a href="#" class="text-secondary text-decoration-none">Privacy Policy</a>
+                    <span>|</span>
+                    <a href="#" class="text-secondary text-decoration-none">Terms &amp; Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Go To Home Quick Button (Visible across all sub-pages) -->
+    {% if request.path != '/' %}
+    <a href="{% url 'store:home' %}" class="floating-home-btn" title="Go to Home">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Home</span>
+    </a>
+    {% endif %}
+
+    <!-- Mobile Bottom Navigation Bar (Sticky at bottom for mobile screens) -->
+    <div class="mobile-bottom-nav d-lg-none">
+        <a href="{% url 'store:home' %}" class="mobile-nav-item {% if request.path == '/' %}active{% endif %}">
+            <i class="bi bi-house-door-fill"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'store:product_list' %}" class="mobile-nav-item {% if '/shop' in request.path or '/products' in request.path %}active{% endif %}">
+            <i class="bi bi-grid-fill"></i>
+            <span>Shop</span>
+        </a>
+        <a href="{% url 'cart:cart_detail' %}" class="mobile-nav-item position-relative {% if '/cart' in request.path %}active{% endif %}">
+            <i class="bi bi-bag-fill"></i>
+            {% if cart|length > 0 %}
+                <span class="mobile-cart-badge">{{ cart|length }}</span>
+            {% endif %}
+            <span>Cart</span>
+        </a>
+        <a href="{% url 'orders:order_history' %}" class="mobile-nav-item {% if '/orders' in request.path %}active{% endif %}">
+            <i class="bi bi-box-seam-fill"></i>
+            <span>Orders</span>
+        </a>
+        <a href="{% if user.is_authenticated %}{% url 'accounts:profile' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="mobile-nav-item {% if '/account' in request.path %}active{% endif %}">
+            <i class="bi bi-person-fill"></i>
+            <span>Account</span>
+        </a>
+    </div>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Main JS with Dynamic Cache-Buster -->
+    <script src="{% static 'js/main.js' %}?v={% now 'U' %}"></script>
+
+    <!-- Built-in Instant Live Search Autocomplete Script -->
+    <style>
+        .header-search-form, .mobile-search-form, form:has(input[name="q"]) {
+            position: relative !important;
+        }
+        .live-search-dropdown {
+            position: absolute !important;
+            top: calc(100% + 8px) !important;
+            left: 0 !important;
+            right: 0 !important;
+            min-width: 300px;
+            background: #FFFFFF !important;
+            border-radius: 16px !important;
+            border: 1.5px solid #E5ECE0 !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18), 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+            z-index: 999999 !important;
+            max-height: 460px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            display: none;
+            padding: 4px 0 !important;
+        }
+        .live-search-item {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            text-decoration: none !important;
+            color: #1F2937 !important;
+            border-bottom: 1px solid #F3F4F6 !important;
+            transition: background-color 0.15s ease !important;
+        }
+        .live-search-item:last-child {
+            border-bottom: none !important;
+        }
+        .live-search-item:hover, .live-search-item.active {
+            background-color: #F4F8F1 !important;
+            color: #111827 !important;
+        }
+        .live-search-thumb {
+            width: 52px !important;
+            height: 52px !important;
+            min-width: 52px !important;
+            border-radius: 10px !important;
+            background-color: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            object-fit: contain !important;
+            padding: 2px !important;
+        }
+        .live-search-info {
+            flex: 1 !important;
+            min-width: 0 !important;
+        }
+        .live-search-title {
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            line-height: 1.3 !important;
+            margin-bottom: 3px !important;
+            color: #111827 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .live-search-meta {
+            font-size: 0.75rem !important;
+            color: #6B7280 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            margin-bottom: 3px !important;
+        }
+        .live-search-badge {
+            background-color: #EEF2F6 !important;
+            color: #374151 !important;
+            padding: 1px 7px !important;
+            border-radius: 9999px !important;
+            font-size: 0.7rem !important;
+            font-weight: 600 !important;
+        }
+        .live-search-price {
+            font-size: 0.88rem !important;
+            font-weight: 700 !important;
+            color: #15803D !important;
+        }
+        .live-search-price del {
+            font-size: 0.75rem !important;
+            color: #9CA3AF !important;
+            font-weight: normal !important;
+            margin-left: 5px !important;
+        }
+        .live-search-discount {
+            font-size: 0.7rem !important;
+            color: #EA580C !important;
+            font-weight: 700 !important;
+            margin-left: 5px !important;
+            background: #FFF7ED !important;
+            padding: 1px 5px !important;
+            border-radius: 4px !important;
+        }
+        .live-search-footer {
+            padding: 11px 14px !important;
+            background-color: #F9FAFB !important;
+            border-top: 1px solid #E5E7EB !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            color: #15803D !important;
+            text-align: center !important;
+            cursor: pointer !important;
+        }
+        .live-search-footer:hover {
+            background-color: #F3F4F6 !important;
+            color: #166534 !important;
+        }
+        .live-search-loading, .live-search-empty {
+            padding: 22px 16px !important;
+            text-align: center !important;
+            font-size: 0.85rem !important;
+            color: #6B7280 !important;
+        }
+        .live-search-pop-tag {
+            background-color: #F8FAF7 !important;
+            border: 1px solid #E5ECE0 !important;
+            color: #1F2937 !important;
+            border-radius: 9999px !important;
+            padding: 5px 13px !important;
+            font-size: 0.78rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            text-decoration: none !important;
+        }
+        .live-search-pop-tag:hover {
+            background-color: #E2EED9 !important;
+            border-color: #65A30D !important;
+            color: #15803D !important;
+        }
+    </style>
+
+    <script>
+    (function() {
+        function setupLiveSearch() {
+            var searchInputs = document.querySelectorAll('input[name="q"]');
+            searchInputs.forEach(function(input) {
+                if (input.dataset.liveSearchBound) return;
+                input.dataset.liveSearchBound = "true";
+
+                var form = input.closest('form') || input.parentElement;
+                form.style.position = 'relative';
+                form.style.zIndex = '1040';
+
+                var dropdown = form.querySelector('.live-search-dropdown');
+                if (!dropdown) {
+                    dropdown = document.createElement('div');
+                    dropdown.className = 'live-search-dropdown shadow-lg';
+                    form.appendChild(dropdown);
+                }
+
+                var debounceTimer = null;
+                var abortCtrl = null;
+                var selectedIndex = -1;
+
+                function closeDropdown() {
+                    dropdown.style.display = 'none';
+                    dropdown.innerHTML = '';
+                    selectedIndex = -1;
+                }
+
+                function highlight(items, idx) {
+                    items.forEach(function(el, i) {
+                        if (i === idx) {
+                            el.classList.add('active');
+                            el.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            el.classList.remove('active');
+                        }
+                    });
+                }
+
+                function showPopular() {
+                    var tags = [
+                        'Samsung', 'Refrigerator', 'Washing Machine',
+                        'Air Conditioner', 'Microwave', 'Dyson',
+                        'Smart TV', 'Water Purifier', 'Mixer Grinder', 'Bosch'
+                    ];
+                    var tagsHtml = tags.map(function(t) {
+                        return '<button type="button" class="live-search-pop-tag pop-btn">' + escapeHtml(t) + '</button>';
+                    }).join('');
+
+                    dropdown.innerHTML = '<div class="p-3">' +
+                        '<div class="d-flex align-items-center justify-content-between mb-2">' +
+                            '<span class="small fw-bold text-dark"><i class="bi bi-fire text-danger me-1"></i> Popular Searches</span>' +
+                            '<span class="text-muted" style="font-size:0.75rem;">Instant Suggestions</span>' +
+                        '</div>' +
+                        '<div class="d-flex flex-wrap gap-2 mb-2">' + tagsHtml + '</div>' +
+                        '<div class="text-muted pt-2 border-top mt-2" style="font-size:0.72rem;"><i class="bi bi-info-circle me-1"></i> Type any letter to see live product photos & prices</div>' +
+                    '</div>';
+                    dropdown.style.display = 'block';
+
+                    dropdown.querySelectorAll('.pop-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            input.value = btn.textContent.trim();
+                            doSearch(input.value.trim());
+                            input.focus();
+                        });
+                    });
+                }
+
+                function doSearch(query) {
+                    clearTimeout(debounceTimer);
+                    if (abortCtrl) {
+                        try { abortCtrl.abort(); } catch(e) {}
+                    }
+
+                    if (!query || query.length < 1) {
+                        showPopular();
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(function() {
+                        if (window.AbortController) {
+                            abortCtrl = new AbortController();
+                        }
+                        dropdown.innerHTML = '<div class="live-search-loading">' +
+                            '<div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>' +
+                            '<span>Searching appliances for "<strong>' + escapeHtml(query) + '</strong>"...</span>' +
+                        '</div>';
+                        dropdown.style.display = 'block';
+
+                        var fetchOpts = abortCtrl ? { signal: abortCtrl.signal } : {};
+                        fetch('/api/search-suggestions/?q=' + encodeURIComponent(query), fetchOpts)
+                            .then(function(res) {
+                                if (!res.ok) throw new Error('Search failed');
+                                return res.json();
+                            })
+                            .then(function(data) {
+                                if (!data.results || data.results.length === 0) {
+                                    dropdown.innerHTML = '<div class="live-search-empty">' +
+                                        '<i class="bi bi-search text-muted fs-4 d-block mb-1"></i>' +
+                                        '<div>No appliances found for "<strong>' + escapeHtml(query) + '</strong>"</div>' +
+                                        '<div class="text-muted small mt-1">Try checking brand names: Samsung, LG, Voltas, Bosch, IFB, Dyson</div>' +
+                                    '</div>';
+                                    return;
+                                }
+
+                                var html = '';
+                                data.results.forEach(function(item) {
+                                    var fallback = 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=120&auto=format&fit=crop&q=60';
+                                    var img = item.image_url || fallback;
+                                    var origPrice = item.original_price ? '<del>' + item.original_price + '</del>' : '';
+                                    var discBadge = item.discount_percent > 0 ? '<span class="live-search-discount">' + item.discount_percent + '% OFF</span>' : '';
+                                    var brandBadge = item.brand ? '<span class="live-search-badge">' + escapeHtml(item.brand) + '</span>' : '';
+                                    var catBadge = item.category ? '<span class="text-muted small">' + escapeHtml(item.category) + '</span>' : '';
+
+                                    html += '<a href="' + item.url + '" class="live-search-item">' +
+                                        '<img src="' + img + '" alt="' + escapeHtml(item.title) + '" class="live-search-thumb" onerror="this.src=\'' + fallback + '\'">' +
+                                        '<div class="live-search-info">' +
+                                            '<div class="live-search-title">' + escapeHtml(item.title) + '</div>' +
+                                            '<div class="live-search-meta">' + brandBadge + catBadge + '</div>' +
+                                            '<div class="live-search-price">' + item.price + ' ' + origPrice + ' ' + discBadge + '</div>' +
+                                        '</div>' +
+                                    '</a>';
+                                });
+
+                                html += '<div class="live-search-footer">View all ' + data.total + ' results for "' + escapeHtml(query) + '" <i class="bi bi-arrow-right ms-1"></i></div>';
+                                dropdown.innerHTML = html;
+                                selectedIndex = -1;
+
+                                var footer = dropdown.querySelector('.live-search-footer');
+                                if (footer) {
+                                    footer.addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        form.submit();
+                                    });
+                                }
+                            })
+                            .catch(function(err) {
+                                if (err.name !== 'AbortError') {
+                                    dropdown.innerHTML = '<div class="live-search-empty text-danger"><i class="bi bi-exclamation-circle me-1"></i> Error loading results. Press Enter to search.</div>';
+                                }
+                            });
+                    }, 150);
+                }
+
+                input.addEventListener('input', function() {
+                    doSearch(input.value.trim());
+                });
+
+                input.addEventListener('focus', function() {
+                    var val = input.value.trim();
+                    if (val.length >= 1) {
+                        doSearch(val);
+                    } else {
+                        showPopular();
+                    }
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    var items = dropdown.querySelectorAll('.live-search-item');
+                    if (dropdown.style.display !== 'block' || items.length === 0) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        selectedIndex = (selectedIndex + 1) % items.length;
+                        highlight(items, selectedIndex);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                        highlight(items, selectedIndex);
+                    } else if (e.key === 'Enter') {
+                        if (selectedIndex >= 0 && items[selectedIndex]) {
+                            e.preventDefault();
+                            window.location.href = items[selectedIndex].href;
+                        }
+                    } else if (e.key === 'Escape') {
+                        closeDropdown();
+                    }
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!form.contains(e.target)) {
+                        closeDropdown();
+                    }
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupLiveSearch);
+        } else {
+            setupLiveSearch();
+        }
+    })();
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Complete Razorpay Payment | HomeHub Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header Badge -->
+                <div class="bg-primary text-white p-4 text-center">
+                    <div class="d-inline-flex p-3 bg-white rounded-circle text-primary shadow-sm mb-3">
+                        <i class="bi bi-shield-check fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Razorpay Secure Checkout</h4>
+                    <p class="small text-white-50 mb-0">Order Reference: <strong>#{{ order.order_number }}</strong></p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Order Details Summary -->
+                    <div class="bg-light rounded-4 p-3 mb-4 border">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Customer Name</span>
+                            <strong class="text-dark">{{ order.full_name }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Contact Phone</span>
+                            <span class="text-dark">{{ order.phone }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Delivery City</span>
+                            <span class="text-dark">{{ order.city }}, {{ order.state }}</span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between align-items-baseline">
+                            <span class="fw-bold text-dark">Amount Payable</span>
+                            <span class="fs-3 fw-extrabold text-primary">₹{{ order.total_amount|floatformat:2|intcomma }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Live UPI QR Code to Scan & Pay -->
+                    <div class="text-center p-3 bg-white rounded-4 border shadow-sm mb-4">
+                        <div class="small text-muted fw-bold mb-2">
+                            <i class="bi bi-qr-code-scan text-primary me-1"></i> Scan to Pay with Any UPI App
+                        </div>
+                        <div class="d-inline-block p-2 bg-light rounded-3 border mb-2">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;margin=4&amp;data=upi%3A%2F%2Fpay%3Fpa%3Dhomehubappliances%40icici%26pn%3DHomeHub%2520Appliances%26am%3D{{ order.total_amount|floatformat:2 }}%26cu%3DINR%26tn%3DOrder-{{ order.order_number }}" 
+                                 alt="Scan QR Code to Pay" 
+                                 class="img-fluid rounded-2 shadow-xs" 
+                                 style="width: 170px; height: 170px;">
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                            <span class="badge bg-light text-dark border">Amount: <strong>₹{{ order.total_amount|floatformat:2|intcomma }}</strong></span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check2-circle me-1"></i>Instant UPI</span>
+                        </div>
+                        <div class="text-muted" style="font-size: 0.72rem;">GPay • PhonePe • Paytm • BHIM • Cred</div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button id="rzp-button" class="btn btn-primary btn-lg w-100 fw-bold py-3 rounded-3 shadow">
+                        <i class="bi bi-lock-fill me-1"></i> Pay ₹{{ order.total_amount|floatformat:2|intcomma }} Now
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-lock-fill text-success me-1"></i> 256-Bit SSL Encrypted by Razorpay
+                        </small>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="{% url 'orders:checkout' %}" class="text-decoration-none small text-muted">
+                            &larr; Return to checkout
+                        </a>
+                        <span class="text-muted small">&bull;</span>
+                        <a href="{% url 'store:home' %}" class="text-decoration-none small text-muted">
+                            <i class="bi bi-house-door-fill me-1"></i> Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Razorpay Callback Form -->
+<form id="razorpay-form" action="{% url 'orders:razorpay_callback' %}" method="POST" class="d-none">
+    {% csrf_token %}
+    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+</form>
+
+<!-- Razorpay Official Checkout SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount_paise }}",
+        "currency": "{{ currency }}",
+        "name": "HomeHub Appliances",
+        "description": "Payment for Order #{{ order.order_number }}",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response) {
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+            document.getElementById('razorpay-form').submit();
+        },
+        "prefill": {
+            "name": "{{ order.full_name|escapejs }}",
+            "email": "{{ order.email|escapejs }}",
+            "contact": "{{ order.phone|escapejs }}"
+        },
+        "notes": {
+            "order_number": "{{ order.order_number }}",
+            "address": "{{ order.address_line1|escapejs }}, {{ order.city|escapejs }}"
+        },
+        "theme": {
+            "color": "#0284c7"
+        },
+        "modal": {
+            "ondismiss": function() {
+                console.log('Razorpay modal closed without payment.');
+            }
+        }
+    };
+
+    const rzp = new Razorpay(options);
+
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    };
+
+    // Auto-launch popup seamlessly after page render
+    setTimeout(function() {
+        try {
+            rzp.open();
+        } catch (err) {
+            console.warn("Auto-popup blocked by browser; user can click button to proceed.", err);
+        }
+    }, 400);
+});
+</script>
+{% endblock %}

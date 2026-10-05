@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60" width="400" height="60">
+  <!-- UPI Badge -->
+  <rect x="10" y="10" width="80" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="50" y="35" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#0284c7" text-anchor="middle">UPI</text>
+
+  <!-- Visa Badge -->
+  <rect x="105" y="10" width="80" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="145" y="35" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#1a1f71" text-anchor="middle">VISA</text>
+
+  <!-- RuPay Badge -->
+  <rect x="200" y="10" width="80" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="240" y="35" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#f26522" text-anchor="middle">RuPay</text>
+
+  <!-- Net Banking Badge -->
+  <rect x="295" y="10" width="95" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="342" y="35" font-family="Arial, sans-serif" font-size="12" font-weight="800" fill="#334155" text-anchor="middle">NET BANK</text>
+</svg>

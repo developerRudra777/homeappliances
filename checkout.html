@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Checkout & Appliance Delivery | VoltCraft Appliances{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none fw-semibold"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cart:cart_detail' %}" class="text-decoration-none text-muted">Cart</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+        </ol>
+    </nav>
+
+    <div class="mb-4">
+        <h2 class="fw-extrabold mb-1">Appliance Delivery & Secure Checkout</h2>
+        <p class="text-muted small">Please provide delivery destination and choose your preferred payment method (UPI, Card, Net Banking, COD)</p>
+    </div>
+
+    {% if demo_mode %}
+        <div class="alert alert-secondary border-0 shadow-sm rounded-4 p-3 mb-4 d-flex align-items-center gap-3">
+            <div class="fs-2 text-primary"><i class="bi bi-info-circle-fill"></i></div>
+            <div>
+                <strong class="d-block text-dark">Your Shopping Cart is Empty (₹0.00)</strong>
+                <span class="small text-muted">You haven't added any appliances to your order yet. You can preview the payment options below, or click <strong>Add Products to Order</strong> to select appliances from the catalog.</span>
+            </div>
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'orders:checkout' %}" id="checkoutForm">
+        {% csrf_token %}
+     <input type="hidden" name="country" value="India">
+        <div class="row g-4">
+            <!-- Left: Delivery Address & Payment Method -->
+            <div class="col-lg-8">
+                <!-- 1. Contact Details -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill text-primary me-2"></i> 1. Contact Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">First Name *</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Last Name *</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Email Address *</label>
+                            {{ form.email }}
+                            <small class="text-muted">Order invoice & tracking updates will be sent here</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Phone Number *</label>
+                            {{ form.phone }}
+                            <small class="text-muted">Our delivery logistics crew will call before arrival</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Delivery Address -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-primary me-2"></i> 2. Delivery & Installation Address</h5>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Street Address *</label>
+                            {{ form.address_line1 }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Apartment, Floor, Landmark (Optional)</label>
+                            {{ form.address_line2 }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">City *</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">State *</label>
+                            {{ form.state }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">PIN Code *</label>
+                            {{ form.postal_code }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Delivery & Elevator Access Notes</label>
+                            {{ form.delivery_instructions }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Payment Method: Razorpay Online (with QR) & Cash on Delivery (COD) -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-shield-lock-fill text-primary me-2"></i> 3. Select Payment Method</h5>
+
+                    <!-- Hidden input connected to form -->
+                    {{ form.payment_method }}
+
+                    <!-- Visual Payment Options -->
+                    <div class="row g-3 mb-4">
+                        <!-- Option 1: Razorpay Online & Dynamic QR Code (Recommended) -->
+                        <div class="col-12">
+                            <div class="payment-option-card active border-primary shadow-sm" data-method="RAZORPAY" onclick="selectPaymentMethod('RAZORPAY')">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="p-2 bg-primary-subtle text-primary rounded-3 fs-3">
+                                            <i class="bi bi-qr-code-scan"></i>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <strong class="text-dark fs-6">Online Payment & Instant UPI QR Code</strong>
+                                                <span class="badge bg-primary text-white">Recommended</span>
+                                            </div>
+                                            <small class="text-muted">Scan Dynamic QR or pay via Google Pay, PhonePe, Paytm, Any UPI, Cards & NetBanking</small>
+                                        </div>
+                                    </div>
+                                    <input type="radio" name="payment_selector" value="RAZORPAY" checked class="form-check-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Cash on Delivery (COD) -->
+                        <div class="col-12">
+                            <div class="payment-option-card" data-method="COD" onclick="selectPaymentMethod('COD')">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="p-2 bg-success-subtle text-success rounded-3 fs-3">
+                                            <i class="bi bi-cash-stack"></i>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <strong class="text-dark fs-6">Cash on Delivery (COD)</strong>
+                                                <span class="badge bg-success text-white">Pay at Home</span>
+                                            </div>
+                                            <small class="text-muted">Pay in cash or scan delivery agent's UPI QR upon appliance delivery & inspection</small>
+                                        </div>
+                                    </div>
+                                    <input type="radio" name="payment_selector" value="COD" class="form-check-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Razorpay / QR Info Panel -->
+                    <div id="razorpayPanel" class="p-4 bg-light rounded-4 border mb-3">
+                        <div class="row align-items-center g-4">
+                            <div class="col-md-4 text-center border-end-md">
+                                <div class="bg-white p-3 rounded-4 shadow-sm d-inline-block border">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&amp;margin=4&amp;data=upi%3A%2F%2Fpay%3Fpa%3Dhomehubappliances%40icici%26pn%3DHomeHub%2520Appliances%26am%3D{{ total_display|floatformat:2 }}%26cu%3DINR" 
+                                         alt="Scan UPI QR Code" 
+                                         class="img-fluid rounded-3" 
+                                         style="width: 150px; height: 150px;">
+                                </div>
+                                <div class="small fw-bold text-dark mt-2"><i class="bi bi-qr-code-scan me-1 text-primary"></i> Scan to Pay ₹{{ total_display|floatformat:2|intcomma }}</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">GPay • PhonePe • Paytm • BHIM</div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-primary text-white">Instant UPI & Cards</span>
+                                    <span class="badge bg-success text-white"><i class="bi bi-shield-check me-1"></i>Official Gateway</span>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1">Scan QR Code or Pay Online</h6>
+                                <p class="text-muted small mb-3">
+                                    You can scan the QR code directly with any UPI App, or click <strong>"Pay Online / Scan QR Code"</strong> below to securely complete your payment with Razorpay (Google Pay, PhonePe, Paytm, Debit/Credit Card, Net Banking).
+                                </p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-white text-secondary border px-2 py-1"><i class="bi bi-qr-code text-primary me-1"></i>Dynamic UPI QR</span>
+                                    <span class="badge bg-white text-secondary border px-2 py-1"><i class="bi bi-phone text-success me-1"></i>GPay / PhonePe / Paytm</span>
+                                    <span class="badge bg-white text-secondary border px-2 py-1"><i class="bi bi-credit-card text-dark me-1"></i>Visa / MasterCard / RuPay</span>
+                                    <span class="badge bg-white text-secondary border px-2 py-1"><i class="bi bi-bank text-info me-1"></i>50+ Net Banking Banks</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COD Panel -->
+                    <div id="codPanel" class="p-4 bg-light rounded-4 border mb-3 d-none">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-box-seam-fill text-success fs-2"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Pay on Delivery & Installation</h6>
+                                <p class="text-muted small mb-0">
+                                    No upfront payment needed! You can pay cash or scan the delivery executive's UPI QR code once your appliance is safely delivered and inspected.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 small text-muted">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i> 256-bit bank-grade SSL encryption on all transactions.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Order Summary -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+                    <h5 class="fw-bold mb-3 border-bottom pb-3">Your Order ({{ cart|length }})</h5>
+
+                    <div class="mb-3 overflow-y-auto" style="max-height: 260px;">
+                        {% for item in cart %}
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="{{ item.product.get_image_url }}" alt="" class="rounded" style="width: 48px; height: 48px; object-fit: contain;">
+                                    <div>
+                                        <h6 class="small fw-bold mb-0">{{ item.product.title|truncatechars:28 }}</h6>
+                                        <small class="text-muted">Qty: {{ item.quantity }} × ₹{{ item.price|floatformat:2|intcomma }}</small>
+                                    </div>
+                                </div>
+                                <span class="small fw-bold">₹{{ item.total_price|floatformat:2|intcomma }}</span>
+                            </div>
+                        {% empty %}
+                            <div class="p-3 bg-light rounded-3 text-center mb-3">
+                                <i class="bi bi-cart-x text-muted fs-3 d-block mb-1"></i>
+                                <span class="small fw-bold text-dark d-block">Your Cart is Empty</span>
+                                <small class="text-muted">No appliances in cart (₹0.00)</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-bold">₹{{ subtotal_display|floatformat:2|intcomma }}</span>
+                    </div>
+
+                    {% if applied_coupon %}
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">
+                                <i class="bi bi-tag-fill text-success me-1"></i>Coupon ({{ applied_coupon.code }})
+                            </span>
+                            <span class="fw-bold text-success">- ₹{{ discount_display|floatformat:2|intcomma }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Appliance Delivery</span>
+                        {% if cart|length == 0 or demo_mode %}
+                            <span class="text-muted fw-bold">₹0.00</span>
+                        {% elif cart.get_shipping == 0 %}
+                            <span class="text-success fw-bold">FREE</span>
+                        {% else %}
+                            <span class="fw-bold">₹{{ cart.get_shipping|floatformat:2|intcomma }}</span>
+                        {% endif %}
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between align-items-baseline mb-4">
+                        <span class="fw-bold fs-5">Total to Pay</span>
+                        <span class="fs-3 fw-extrabold text-primary">₹{{ total_display|floatformat:2|intcomma }}</span>
+                    </div>
+
+                    {% if cart|length > 0 %}
+                        <button type="submit" id="checkoutSubmitBtn" class="btn btn-primary btn-lg w-100 fw-bold py-3 rounded-3 shadow">
+                            <i class="bi bi-qr-code-scan me-1"></i> Pay Online / Scan QR Code <i class="bi bi-arrow-right-circle ms-1"></i>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg w-100 fw-bold py-3 rounded-3 shadow-sm">
+                            <i class="bi bi-plus-circle me-1"></i> Add Products to Order
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

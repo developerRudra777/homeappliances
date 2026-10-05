@@ -1,0 +1,78 @@
+{% load humanize %}
+
+<div class="appliance-card shadow-sm h-100">
+    <!-- Top Badges -->
+    {% if product.energy_rating and product.energy_rating != 'N/A' %}
+        <span class="card-energy-badge">
+            <i class="bi bi-star-fill text-warning me-1"></i> {{ product.energy_rating }}
+        </span>
+    {% endif %}
+
+    {% if product.discount_percent > 0 %}
+        <span class="card-discount-badge">
+            -{{ product.discount_percent }}% OFF
+        </span>
+    {% endif %}
+
+    <!-- Appliance Image -->
+    <a href="{{ product.get_absolute_url }}" class="appliance-img-wrapper text-decoration-none">
+        <img src="{{ product.get_image_url }}" alt="{{ product.title }}" loading="lazy">
+    </a>
+
+    <!-- Card Body -->
+    <div class="appliance-card-body">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="appliance-brand text-truncate me-2">{{ product.brand.name }}</span>
+            <small class="text-muted text-nowrap" style="font-size: 0.72rem;"><i class="bi bi-shield-check text-success me-1"></i>{{ product.warranty|default:"1 Yr"|truncatechars:14 }}</small>
+        </div>
+
+        <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
+            <h5 class="appliance-title" title="{{ product.title }}">{{ product.title }}</h5>
+        </a>
+
+        <!-- Specs Highlights -->
+        <div class="appliance-specs-tags">
+            {% if product.capacity %}
+                <span class="spec-tag"><i class="bi bi-box-seam me-1"></i>{{ product.capacity }}</span>
+            {% endif %}
+            {% if product.color %}
+                <span class="spec-tag"><i class="bi bi-palette me-1"></i>{{ product.color }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Rating -->
+        <div class="d-flex align-items-center gap-1 mb-2 small" style="font-size: 0.76rem;">
+            <span class="text-warning"><i class="bi bi-star-fill"></i></span>
+            <span class="fw-bold">{{ product.average_rating }}</span>
+            <span class="text-muted">({{ product.review_count|default:"12" }})</span>
+            {% if product.in_stock %}
+                <span class="badge bg-success-subtle text-success ms-auto" style="font-size: 0.65rem; padding: 2px 6px;">In Stock</span>
+            {% else %}
+                <span class="badge bg-danger-subtle text-danger ms-auto" style="font-size: 0.65rem; padding: 2px 6px;">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        <!-- Price and Quick Add to Cart -->
+        <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+            <div>
+                <span class="price-current">₹{{ product.current_price|floatformat:0|intcomma }}</span>
+                {% if product.savings > 0 %}
+                    <span class="price-original">₹{{ product.price|floatformat:0|intcomma }}</span>
+                {% endif %}
+            </div>
+
+            {% if product.in_stock %}
+                <form action="{% url 'cart:cart_add' product.id %}" method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold d-flex align-items-center gap-1 shadow-xs" title="Add to Cart">
+                        <i class="bi bi-cart-plus"></i>
+                        <span>Add</span>
+                    </button>
+                </form>
+            {% else %}
+                <span class="badge bg-light text-secondary border px-2 py-1 small">Sold Out</span>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,637 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Profile | HomeHub Smart Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="row g-4">
+        
+        <!-- Left Sidebar (Image 2 Left) -->
+        <div class="col-lg-3 col-md-4">
+            <div class="profile-sidebar-card shadow-sm">
+                <nav class="d-flex flex-column">
+                    <a href="{% url 'accounts:profile' %}" class="profile-nav-link active">
+                        <i class="bi bi-person"></i> My Profile
+                    </a>
+                    <a href="{% url 'orders:order_history' %}" class="profile-nav-link">
+                        <i class="bi bi-box-seam"></i> My Orders
+                    </a>
+                    <a href="#returnsModal" data-bs-toggle="modal" class="profile-nav-link">
+                        <i class="bi bi-arrow-return-left"></i> My Returns
+                    </a>
+                    <a href="#wishlistModal" data-bs-toggle="modal" class="profile-nav-link">
+                        <i class="bi bi-heart"></i> My Wishlist
+                    </a>
+                    <a href="{% url 'store:recently_viewed' %}" class="profile-nav-link d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-eye"></i> Recently Viewed</span>
+                        {% if recently_viewed_count %}
+                            <span class="badge bg-orange rounded-pill" style="font-size: 0.7rem;">{{ recently_viewed_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="#savedAddressesSec" class="profile-nav-link">
+                        <i class="bi bi-geo-alt"></i> My Addresses
+                    </a>
+                    <a href="{% url 'direct_checkout' %}" class="profile-nav-link">
+                        <i class="bi bi-credit-card"></i> Payment Methods
+                    </a>
+                    <a href="#reviewsModal" data-bs-toggle="modal" class="profile-nav-link">
+                        <i class="bi bi-star"></i> My Reviews
+                    </a>
+                    <a href="#notificationsModal" data-bs-toggle="modal" class="profile-nav-link">
+                        <i class="bi bi-bell"></i> Notifications
+                    </a>
+                    <a href="#editProfileCollapse" data-bs-toggle="collapse" class="profile-nav-link">
+                        <i class="bi bi-gear"></i> Account Settings
+                    </a>
+                    <a href="#passwordModal" data-bs-toggle="modal" class="profile-nav-link">
+                        <i class="bi bi-shield-lock"></i> Change Password
+                    </a>
+                    <a href="#supportModal" data-bs-toggle="modal" class="profile-nav-link">
+                        <i class="bi bi-question-circle"></i> Help &amp; Support
+                    </a>
+                    <form action="{% url 'accounts:logout' %}" method="POST" class="mt-2 pt-2 border-top">
+                        {% csrf_token %}
+                        <button type="submit" class="profile-nav-link text-danger border-0 bg-transparent w-100 text-start">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
+                </nav>
+
+                <!-- Become an Elite Member Card (Image 2 Bottom-Left) -->
+                <div class="elite-member-box shadow-xs">
+                    <div class="text-orange fs-3 mb-1"><i class="bi bi-shield-check"></i></div>
+                    <h6 class="fw-bold text-dark mb-1">Become a HomeHub Elite Member</h6>
+                    <p class="small text-muted mb-3" style="font-size: 0.78rem;">Get exclusive offers, early access to deals &amp; free installation!</p>
+                    <button type="button" class="btn btn-primary btn-sm w-100 fw-bold py-2">
+                        Explore Elite Benefits
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Main Profile Area (Image 2 Right) -->
+        <div class="col-lg-9 col-md-8">
+            
+            <!-- 1. Header Profile Banner with Photo Upload -->
+            <div class="profile-header-card shadow-sm">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-4">
+                    <div class="d-flex align-items-center gap-3">
+                        
+                        <!-- Avatar Container with Clickable Camera Icon -->
+                        <div class="profile-avatar-wrapper position-relative">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" id="profileAvatarImg">
+                            {% else %}
+                                <span id="profileAvatarInitials">{{ user.first_name|default:user.username|slice:":2"|upper }}</span>
+                            {% endif %}
+
+                            <!-- Hidden Form for Instant Photo Upload -->
+                            <form method="POST" action="{% url 'accounts:profile' %}" enctype="multipart/form-data" id="avatarUploadForm">
+                                {% csrf_token %}
+                                <input type="file" name="avatar" id="avatarFileInput" class="d-none" accept="image/*" onchange="document.getElementById('avatarUploadForm').submit();">
+                            </form>
+
+                            <button type="button" class="profile-avatar-camera-btn" title="Click to upload profile photo" onclick="document.getElementById('avatarFileInput').click();">
+                                <i class="bi bi-camera-fill"></i>
+                            </button>
+                        </div>
+
+                        <!-- User Info -->
+                        <div>
+                            <h4 class="fw-extrabold text-dark mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="text-muted small">{{ user.email|default:user.username }}</span>
+                                <span class="badge bg-success-subtle text-success small px-2 py-0" style="font-size: 0.7rem;">&check; Verified</span>
+                            </div>
+                            <div class="small text-muted">
+                                <i class="bi bi-telephone me-1 text-orange"></i> {% if profile.phone %}{{ profile.phone }}{% else %}<span class="text-muted fst-italic">No phone added</span>{% endif %}
+                                <span class="mx-2">&bull;</span>
+                                <i class="bi bi-calendar3 me-1"></i> Member since {{ user.date_joined|date:"M Y" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Profile Action Button -->
+                    <div>
+                        <button class="btn btn-outline-dark btn-sm px-3 fw-bold rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#editProfileCollapse">
+                            <i class="bi bi-pencil me-1 text-orange"></i> Edit Profile
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Collapsible Profile Edit Form -->
+                <div class="collapse mt-4 pt-3 border-top" id="editProfileCollapse">
+                    <h6 class="fw-bold mb-3 text-dark">Update Personal Information &amp; Photo</h6>
+                    <form method="POST" action="{% url 'accounts:profile' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Email Address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Mobile Number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Upload New Profile Photo</label>
+                                {{ form.avatar }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Delivery Address</label>
+                                {{ form.address }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">City</label>
+                                {{ form.city }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">PIN Code</label>
+                                {{ form.postal_code }}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">
+                                Save Profile Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 2. Four Stat Metric Cards (Dynamic & Real) -->
+            <div class="row g-3 mb-4">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="metric-stat-card shadow-xs">
+                        <div class="stat-icon">
+                            <i class="bi bi-bag-check"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val">{{ total_orders }}</div>
+                            <div class="stat-label">Orders</div>
+                            <a href="{% url 'orders:order_history' %}" class="small text-orange fw-bold text-decoration-none" style="font-size: 0.75rem;">View all orders</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="metric-stat-card shadow-xs">
+                        <div class="stat-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val">{{ returns_count }}</div>
+                            <div class="stat-label">Returns</div>
+                            <a href="#returnsModal" data-bs-toggle="modal" class="small text-orange fw-bold text-decoration-none" style="font-size: 0.75rem;">View returns</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="metric-stat-card shadow-xs">
+                        <div class="stat-icon">
+                            <i class="bi bi-heart"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val">{{ wishlist_count }}</div>
+                            <div class="stat-label">Wishlist Items</div>
+                            <a href="#wishlistModal" data-bs-toggle="modal" class="small text-orange fw-bold text-decoration-none" style="font-size: 0.75rem;">View wishlist</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="metric-stat-card shadow-xs">
+                        <div class="stat-icon">
+                            <i class="bi bi-star"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val">{{ reward_points }}</div>
+                            <div class="stat-label">Reward Points</div>
+                            <a href="#rewardsModal" data-bs-toggle="modal" class="small text-orange fw-bold text-decoration-none" style="font-size: 0.75rem;">View rewards</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Recent Orders Section (Image 2 Middle) -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">Recent Orders</h5>
+                    <a href="{% url 'orders:order_history' %}" class="text-orange fw-bold text-decoration-none small">
+                        View All Orders
+                    </a>
+                </div>
+
+                {% if orders %}
+                    {% for order in orders %}
+                        <div class="recent-order-row">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 bg-light p-2 border d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-box-seam fs-4 text-orange"></i>
+                                </div>
+                                <div>
+                                    <strong class="d-block text-dark small">{{ order.items.first.product.title|default:"Smart Home Appliance"|truncatechars:45 }}</strong>
+                                    <div class="text-muted" style="font-size: 0.76rem;">
+                                        Order ID: <strong>#{{ order.order_number }}</strong> &bull; Placed on {{ order.created_at|date:"d M Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-success-subtle text-success small px-2 py-1">
+                                    {{ order.get_status_display }}
+                                </span>
+                                <strong class="fs-6 text-dark">₹{{ order.total_amount|floatformat:0|intcomma }}</strong>
+                                <a href="{% url 'orders:order_invoice' order.order_number %}" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem;" title="Download Tax Invoice">
+                                    <i class="bi bi-receipt"></i> Bill
+                                </a>
+                                <a href="{% url 'orders:order_detail' order.order_number %}" class="text-muted"><i class="bi bi-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'orders:order_history' %}" class="text-orange fw-bold text-decoration-none small">
+                            View all orders &rarr;
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-bag-x fs-1 text-secondary opacity-50 mb-2 d-block"></i>
+                        <h6 class="fw-bold text-dark mb-1">No orders placed yet</h6>
+                        <p class="small text-muted mb-3">When you purchase an appliance, real-time live tracking and downloadable tax invoices will appear here.</p>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-sm btn-primary px-3 fw-bold rounded-pill">Start Shopping</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Recently Viewed Appliances Card Section -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="fw-bold mb-0 text-dark">Recently Viewed Appliances</h5>
+                        {% if recently_viewed_count %}
+                            <span class="badge bg-secondary-subtle text-secondary small rounded-pill">{{ recently_viewed_count }} items</span>
+                        {% endif %}
+                    </div>
+                    {% if recently_viewed %}
+                        <a href="{% url 'store:recently_viewed' %}" class="text-orange fw-bold text-decoration-none small">
+                            View All History &rarr;
+                        </a>
+                    {% endif %}
+                </div>
+
+                {% if recently_viewed %}
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+                        {% for product in recently_viewed %}
+                            <div class="col">
+                                <div class="card h-100 border rounded-3 p-2 text-center text-decoration-none bg-white">
+                                    <a href="{{ product.get_absolute_url }}" class="d-block mb-2 text-decoration-none">
+                                        {% if product.get_image_url %}
+                                            <img src="{{ product.get_image_url }}" alt="{{ product.title }}" class="img-fluid rounded-2" style="height: 90px; object-fit: contain;">
+                                        {% else %}
+                                            <div class="bg-light rounded-2 d-flex align-items-center justify-content-center" style="height: 90px;">
+                                                <i class="bi bi-image text-muted fs-3"></i>
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                    <div class="text-truncate fw-semibold text-dark small" title="{{ product.title }}">
+                                        <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">{{ product.title }}</a>
+                                    </div>
+                                    <div class="text-orange fw-bold small mt-1">₹{{ product.price|floatformat:0|intcomma }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-3 text-muted">
+                        <i class="bi bi-eye-slash fs-2 text-secondary opacity-50 mb-1 d-block"></i>
+                        <p class="small text-muted mb-2">No recently viewed appliances yet. Start browsing our catalog!</p>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-sm btn-outline-dark rounded-pill px-3">Explore Store</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- 4. Saved Addresses & Payment Methods Side-by-Side (Image 2 Bottom) -->
+            <div class="row g-4" id="savedAddressesSec">
+                
+                <!-- Saved Addresses Card -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="fw-bold mb-0 text-dark">Saved Addresses</h6>
+                            <button type="button" class="btn btn-sm p-0 text-orange fw-bold small border-0" data-bs-toggle="collapse" data-bs-target="#editProfileCollapse">
+                                {% if profile.address %}Edit{% else %}Add{% endif %}
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mb-3">Manage your delivery addresses</small>
+
+                        {% if profile.address %}
+                            <div class="p-3 rounded-3 border bg-light mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-house text-orange"></i>
+                                        <strong class="small text-dark">Primary Address</strong>
+                                    </div>
+                                    <span class="badge bg-orange bg-opacity-10 text-orange small" style="font-size: 0.7rem;">Default</span>
+                                </div>
+                                <div class="small fw-bold text-dark mb-1">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="small text-muted mb-1">{{ profile.address }}</div>
+                                <div class="small text-muted mb-2">{{ profile.city }}{% if profile.postal_code %} - {{ profile.postal_code }}{% endif %}{% if profile.state %}, {{ profile.state }}{% endif %}</div>
+                                {% if profile.phone %}
+                                    <div class="small fw-semibold text-dark"><i class="bi bi-telephone text-orange me-1"></i> {{ profile.phone }}</div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="p-4 rounded-3 border bg-light text-center mb-3">
+                                <i class="bi bi-geo-alt text-muted fs-3 mb-2 d-block"></i>
+                                <div class="small text-muted mb-2">No delivery address saved yet.</div>
+                                <button type="button" class="btn btn-sm btn-outline-dark fw-bold rounded-pill" data-bs-toggle="collapse" data-bs-target="#editProfileCollapse">
+                                    + Add Address
+                                </button>
+                            </div>
+                        {% endif %}
+
+                        <button type="button" class="dashed-add-card-btn" data-bs-toggle="collapse" data-bs-target="#editProfileCollapse">
+                            + Update Address &amp; Info
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Methods Card -->
+                <div class="col-md-6" id="savedPaymentSec">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="fw-bold mb-0 text-dark">Payment Methods</h6>
+                            <a href="{% url 'direct_checkout' %}" class="text-orange fw-bold small text-decoration-none">Payment Page</a>
+                        </div>
+                        <small class="text-muted d-block mb-3">Accepted payment channels for your orders</small>
+
+                        <!-- UPI Item -->
+                        <div class="p-3 rounded-3 border bg-light mb-2 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fw-bold text-success fs-5"><i class="bi bi-qr-code"></i></span>
+                                <div>
+                                    <strong class="d-block small text-dark">UPI &amp; QR Pay</strong>
+                                    <span class="text-muted small">Google Pay, PhonePe, Paytm</span>
+                                </div>
+                            </div>
+                            <span class="badge bg-success-subtle text-success small" style="font-size: 0.7rem;">Active</span>
+                        </div>
+
+                        <!-- Card Item -->
+                        <div class="p-3 rounded-3 border bg-light mb-3 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fw-extrabold text-primary fs-5"><i class="bi bi-credit-card-2-front"></i></span>
+                                <div>
+                                    <strong class="d-block small text-dark">Cards &amp; Net Banking</strong>
+                                    <span class="text-muted small">Visa, Mastercard, RuPay &amp; COD</span>
+                                </div>
+                            </div>
+                            <span class="badge bg-orange bg-opacity-10 text-orange small" style="font-size: 0.7rem;">Verified</span>
+                        </div>
+
+                        <a href="{% url 'direct_checkout' %}" class="dashed-add-card-btn">
+                            Go to Quick Payment &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Bottom Trust Guarantee Perks (Image 2 Bottom) -->
+            <div class="trust-strip-box mt-4">
+                <div class="row g-3 text-center">
+                    <div class="col-md-2 col-sm-4 col-6">
+                        <div class="trust-col">
+                            <div class="trust-icon-circle"><i class="bi bi-shield-check"></i></div>
+                            <strong>100% Original</strong>
+                            <span>Certified products</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6">
+                        <div class="trust-col">
+                            <div class="trust-icon-circle"><i class="bi bi-truck"></i></div>
+                            <strong>Fast &amp; Secure</strong>
+                            <span>Doorstep delivery</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-4 col-6">
+                        <div class="trust-col">
+                            <div class="trust-icon-circle"><i class="bi bi-arrow-repeat"></i></div>
+                            <strong>Easy Returns</strong>
+                            <span>Hassle-free 7 days</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 col-6">
+                        <div class="trust-col">
+                            <div class="trust-icon-circle"><i class="bi bi-credit-card"></i></div>
+                            <strong>Secure Pay</strong>
+                            <span>100% encrypted</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="trust-col">
+                            <div class="trust-icon-circle"><i class="bi bi-headset"></i></div>
+                            <strong>24/7 Support</strong>
+                            <span>We're here for you</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Returns Modal -->
+<div class="modal fade" id="returnsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-arrow-return-left text-orange me-2"></i> My Returns &amp; Replacements</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-center">
+                <div class="rounded-circle bg-light d-inline-flex p-3 mb-3 text-muted">
+                    <i class="bi bi-box-seam fs-1"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">No Active Return Requests</h6>
+                <p class="small text-muted mb-3">All eligible appliances come with a 7-day hassle-free replacement guarantee for transit defects or hardware faults. Once an item is delivered, you can request a return directly from its order details page.</p>
+                <a href="{% url 'orders:order_history' %}" class="btn btn-sm btn-primary px-4 fw-bold rounded-pill">View My Orders</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Wishlist Modal -->
+<div class="modal fade" id="wishlistModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-heart text-danger me-2"></i> My Wishlist</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-center">
+                <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex p-3 mb-3 text-danger">
+                    <i class="bi bi-heart-fill fs-1"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">Your Wishlist is Empty</h6>
+                <p class="small text-muted mb-3">Explore our wide catalog of Refrigerators, Air Conditioners, Washing Machines, and Smart Kitchen appliances to save your favorite picks!</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-sm btn-primary px-4 fw-bold rounded-pill">Explore Appliances</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-bell text-orange me-2"></i> Notifications &amp; Alerts</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-3">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item px-0 py-3 border-bottom">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-2 text-success">
+                                <i class="bi bi-check-circle-fill fs-5"></i>
+                            </div>
+                            <div>
+                                <strong class="d-block small text-dark">Welcome to HomeHub!</strong>
+                                <span class="text-muted small">Your account is verified and ready. Enjoy genuine warranty on all home appliances.</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if orders %}
+                        <div class="list-group-item px-0 py-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="rounded-circle bg-orange bg-opacity-10 p-2 text-orange">
+                                    <i class="bi bi-truck fs-5"></i>
+                                </div>
+                                <div>
+                                    <strong class="d-block small text-dark">Order #{{ orders.first.order_number }} Update</strong>
+                                    <span class="text-muted small">Status: {{ orders.first.get_status_display }}. You can track shipment live in your orders.</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reviews Modal -->
+<div class="modal fade" id="reviewsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-star text-orange me-2"></i> My Appliance Reviews</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 mb-3 text-primary">
+                    <i class="bi bi-star-fill fs-1"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">No Reviews Submitted Yet</h6>
+                <p class="small text-muted mb-3">After unboxing and installing your appliance, share your honest experience directly on the product's details page to help other shoppers!</p>
+                <a href="{% url 'orders:order_history' %}" class="btn btn-sm btn-outline-dark px-4 fw-bold rounded-pill">View Purchased Appliances</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reward Points Modal -->
+<div class="modal fade" id="rewardsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-award text-orange me-2"></i> HomeHub Rewards</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-center">
+                <div class="display-5 fw-extrabold text-orange mb-1">{{ reward_points }}</div>
+                <div class="text-muted small fw-bold text-uppercase mb-3">Available Reward Points</div>
+                <div class="p-3 bg-light rounded-3 text-start small text-muted mb-3">
+                    <div class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Earn <strong>50 points</strong> on every completed appliance order.</div>
+                    <div class="mb-0"><i class="bi bi-check-circle-fill text-success me-2"></i> Redeem points automatically for instant discounts at checkout!</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-primary px-4 fw-bold rounded-pill" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Change Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-shield-lock text-primary me-2"></i> Account Security &amp; Password</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="small text-muted mb-3">Your password protects your account, saved addresses, and payment information. You can change your password below or request a secure reset link.</p>
+                <div class="p-3 bg-light rounded-3 small mb-3">
+                    <div class="fw-bold text-dark mb-1">Registered Account Email:</div>
+                    <div class="text-muted">{{ user.email|default:user.username }}</div>
+                </div>
+                <div class="alert alert-info py-2 small mb-0 rounded-3">
+                    <i class="bi bi-info-circle me-1"></i> To update personal details, click <strong>"Edit Profile"</strong> on your dashboard.
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-sm btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help & Support Modal -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-headset text-orange me-2"></i> 24/7 Appliance Support</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="small text-muted mb-4 text-center">Have a question regarding appliance specifications, delivery status, or warranty? Our support team is ready to assist you.</p>
+                <div class="d-flex flex-column gap-3">
+                    <a href="tel:18001234567" class="p-3 rounded-3 border bg-light d-flex align-items-center gap-3 text-decoration-none text-dark">
+                        <div class="rounded-circle bg-orange bg-opacity-10 p-2 text-orange">
+                            <i class="bi bi-telephone-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block small">Toll-Free Customer Care</strong>
+                            <span class="text-muted small">1800 123 4567 (9 AM - 9 PM Daily)</span>
+                        </div>
+                    </a>
+                    <a href="mailto:support@homehub.com" class="p-3 rounded-3 border bg-light d-flex align-items-center gap-3 text-decoration-none text-dark">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-2 text-primary">
+                            <i class="bi bi-envelope-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block small">Email Helpdesk</strong>
+                            <span class="text-muted small">support@homehub.com</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

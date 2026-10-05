@@ -1,0 +1,173 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}{{ page_title }} | VoltCraft Administration{% endblock %}
+
+{% block portal_content %}
+<div class="mb-4">
+    <a href="{% url 'admin_portal:products' %}" class="btn btn-outline-secondary btn-sm mb-2">
+        &laquo; Back to Products
+    </a>
+    <h4 class="fw-extrabold mb-1">{% if is_edit %}Edit Appliance: {{ product.title }}{% else %}Add New Home Appliance{% endif %}</h4>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-4">
+        <!-- Left Column: Core Fields -->
+        <div class="col-lg-8">
+            <div class="portal-card p-4 mb-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">1. Basic Information</h6>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Appliance Title *</label>
+                    {{ form.title }}
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Brand *</label>
+                        {{ form.brand }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Category *</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">SKU (Stock Keeping Unit) *</label>
+                        {{ form.sku }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Model Number</label>
+                        {{ form.model_number }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Short Summary / Highlights</label>
+                    {{ form.summary }}
+                </div>
+                <div>
+                    <label class="form-label small fw-bold">Detailed Overview</label>
+                    {{ form.description }}
+                </div>
+            </div>
+
+            <!-- Technical Specifications -->
+            <div class="portal-card p-4 mb-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">2. Technical Specifications</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Energy Efficiency Rating *</label>
+                        {{ form.energy_rating }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Capacity (e.g. 653 Litres, 9 kg)</label>
+                        {{ form.capacity }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Manufacturer Warranty</label>
+                        {{ form.warranty }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Color / Exterior Finish</label>
+                        {{ form.color }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Power Draw / Electricity Requirements</label>
+                        {{ form.power_consumption }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Dimensions (W x D x H)</label>
+                        {{ form.dimensions }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Pricing, Inventory & Media -->
+        <div class="col-lg-4">
+            <!-- Pricing Card -->
+            <div class="portal-card p-4 mb-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">3. Pricing & Stock</h6>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Regular Price (₹) *</label>
+                    {{ form.price }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Discount / Sale Price (₹)</label>
+                    {{ form.discount_price }}
+                    <small class="text-muted">Leave empty if not on discount.</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Stock Quantity in Warehouse *</label>
+                    {{ form.stock }}
+                </div>
+            </div>
+
+            <!-- Media Card -->
+            <div class="portal-card p-4 mb-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">4. Appliance Image</h6>
+                
+                <!-- Option A: Upload Downloaded Photo from Device -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-upload text-primary me-1"></i> Upload Downloaded Photo from Device
+                    </label>
+                    {{ form.image }}
+                    <small class="text-muted d-block mt-1">Select a downloaded photo (.jpg, .png, .webp) from your computer/device.</small>
+                </div>
+
+                <div class="d-flex align-items-center my-3">
+                    <hr class="flex-grow-1 my-0">
+                    <span class="px-2 text-muted small fw-bold text-uppercase">AND / OR</span>
+                    <hr class="flex-grow-1 my-0">
+                </div>
+
+                <!-- Option B: Image URL -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-link-45deg text-success me-1"></i> Image URL (Preserved in Database)
+                    </label>
+                    {{ form.image_url }}
+                    <small class="text-muted d-block mt-1">Online photo link or CDN fallback. Database will keep this URL safely.</small>
+                </div>
+
+                <!-- Current Image Preview -->
+                {% if product and product.get_image_url %}
+                <div class="mt-3 pt-3 border-top">
+                    <span class="small fw-bold text-secondary d-block mb-2">Current Active Preview:</span>
+                    <div class="text-center p-2 border rounded-3 bg-light">
+                        <img src="{{ product.get_image_url }}" alt="{{ product.title }}" class="img-fluid rounded-2" style="max-height: 140px; object-fit: contain;">
+                        <div class="mt-2">
+                            {% if product.image %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle small"><i class="bi bi-hdd-fill me-1"></i> Loaded from Device File</span>
+                            {% elif product.image_url %}
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle small"><i class="bi bi-globe me-1"></i> Loaded from Web URL</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Visibility Status -->
+            <div class="portal-card p-4 mb-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">5. Visibility & Tags</h6>
+                <div class="form-check mb-2">
+                    {{ form.is_available }}
+                    <label class="form-check-label small fw-semibold" for="{{ form.is_available.id_for_label }}">Available for sale</label>
+                </div>
+                <div class="form-check mb-2">
+                    {{ form.is_featured }}
+                    <label class="form-check-label small fw-semibold" for="{{ form.is_featured.id_for_label }}">Featured on homepage</label>
+                </div>
+                <div class="form-check">
+                    {{ form.is_deal_of_the_day }}
+                    <label class="form-check-label small fw-semibold" for="{{ form.is_deal_of_the_day.id_for_label }}">Flash Deal of the Day</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow">
+                {% if is_edit %}Save Changes{% else %}Publish Appliance{% endif %}
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}

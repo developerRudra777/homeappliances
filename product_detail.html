@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ product.title }} | VoltCraft Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none fw-semibold"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:categories_list' %}" class="text-decoration-none">Categories</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:category_detail' product.category.slug %}" class="text-decoration-none">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.brand.name }} {{ product.model_number }}</li>
+        </ol>
+    </nav>
+
+    <!-- Main Product View -->
+    <div class="row g-4 mb-5">
+        <!-- Left: Image & Trust Badges -->
+        <div class="col-lg-6">
+            <div class="detail-gallery-img shadow-sm position-relative mb-3">
+                {% if product.energy_rating and product.energy_rating != 'N/A' %}
+                    <span class="card-energy-badge fs-6 py-1 px-3">
+                        <i class="bi bi-star-fill text-orange me-1"></i> {{ product.energy_rating }}
+                    </span>
+                {% endif %}
+
+                {% if product.discount_percent > 0 %}
+                    <span class="card-discount-badge fs-6 py-1 px-3">
+                        -{{ product.discount_percent }}% OFF
+                    </span>
+                {% endif %}
+
+                <img src="{{ product.get_image_url }}" alt="{{ product.title }}" class="img-fluid" id="mainProductImage">
+            </div>
+
+            <!-- Appliance Guarantee Strip -->
+            <div class="p-3 bg-white rounded-3 border d-flex justify-content-around text-center small text-muted">
+                <div>
+                    <i class="bi bi-patch-check-fill text-primary fs-5 d-block mb-1"></i>
+                    <strong class="text-dark">100% Genuine</strong>
+                    <div>Brand Direct</div>
+                </div>
+                <div class="border-start ps-3">
+                    <i class="bi bi-tools text-success fs-5 d-block mb-1"></i>
+                    <strong class="text-dark">Free Demo</strong>
+                    <div>At Your Doorstep</div>
+                </div>
+                <div class="border-start ps-3">
+                    <i class="bi bi-shield-check text-success fs-5 d-block mb-1"></i>
+                    <strong class="text-dark">{{ product.warranty|truncatechars:20 }}</strong>
+                    <div>Service Warranty</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Purchase Details & Key Specs -->
+        <div class="col-lg-6">
+            <div class="ps-lg-3">
+                <!-- Brand & Model -->
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-2">
+                        {{ product.brand.name }}
+                    </span>
+                    <span class="text-muted small">Model: <strong>{{ product.model_number|default:"HA-2026" }}</strong></span>
+                </div>
+
+                <h2 class="fw-extrabold text-dark mb-2">{{ product.title }}</h2>
+
+                <!-- Rating and SKU -->
+                <div class="d-flex align-items-center gap-3 mb-3 small">
+                    <div class="d-flex align-items-center text-orange">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                        <span class="text-dark fw-bold ms-2">{{ product.average_rating }}</span>
+                    </div>
+                    <span class="text-muted">|</span>
+                    <a href="#reviews" class="text-decoration-none text-muted fw-semibold">
+                        {{ product.review_count|default:"18" }} Verified Reviews
+                    </a>
+                    <span class="text-muted">|</span>
+                    <span class="text-muted">SKU: <strong>{{ product.sku }}</strong></span>
+                </div>
+
+                <!-- Price Box -->
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <div class="d-flex align-items-baseline gap-3">
+                        <span class="display-6 fw-extrabold text-primary">₹{{ product.current_price|floatformat:2|intcomma }}</span>
+                        {% if product.savings > 0 %}
+                            <span class="fs-5 text-muted text-decoration-line-through">₹{{ product.price|floatformat:2|intcomma }}</span>
+                            <span class="badge bg-danger rounded-pill">Save ₹{{ product.savings|floatformat:2|intcomma }}</span>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted d-block mt-1">Inclusive of all local taxes. Major appliance delivery included on orders ₹10,000+.</small>
+                </div>
+
+                <!-- Summary Paragraph -->
+                <p class="text-secondary mb-4">{{ product.summary }}</p>
+
+                <!-- Quick Specs Grid -->
+                <div class="row g-2 mb-4">
+                    <div class="col-6">
+                        <div class="p-2 border rounded bg-white small">
+                            <span class="text-muted d-block">Capacity</span>
+                            <strong class="text-dark">{{ product.capacity|default:"Standard Family Size" }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 border rounded bg-white small">
+                            <span class="text-muted d-block">Energy Rating</span>
+                            <strong class="text-success"><i class="bi bi-award me-1"></i>{{ product.energy_rating }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 border rounded bg-white small">
+                            <span class="text-muted d-block">Finish / Color</span>
+                            <strong class="text-dark">{{ product.color|default:"Stainless Steel" }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 border rounded bg-white small">
+                            <span class="text-muted d-block">Warranty</span>
+                            <strong class="text-dark">{{ product.warranty }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add to Cart & Buy Now Form -->
+                {% if product.in_stock %}
+                    <form action="{% url 'cart:cart_add' product.id %}" method="POST" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row g-2 align-items-center mb-3">
+                            <div class="col-auto">
+                                <label class="small fw-bold text-muted">Quantity:</label>
+                            </div>
+                            <div class="col-auto">
+                                <div class="input-group" style="width: 140px;">
+                                    <button class="btn btn-outline-secondary btn-qty-minus" type="button"><i class="bi bi-dash"></i></button>
+                                    <input type="number" name="quantity" class="form-control text-center input-qty" value="1" min="1" max="{{ product.stock }}">
+                                    <button class="btn btn-outline-secondary btn-qty-plus" type="button"><i class="bi bi-plus"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-success-subtle text-success small">
+                                    <i class="bi bi-check-circle me-1"></i> {{ product.stock }} units in stock
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" name="action" value="add_to_cart" class="btn btn-primary btn-lg px-4 flex-fill fw-bold shadow-sm">
+                                <i class="bi bi-cart-plus me-2"></i> Add To Cart
+                            </button>
+                            <button type="submit" name="action" value="buy_now" class="btn btn-dark btn-lg px-4 flex-fill fw-bold shadow-sm">
+                                <i class="bi bi-bag-check-fill me-2"></i> Buy Now
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-secondary d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div>This appliance is temporarily out of stock. Check back soon or browse related models!</div>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Specifications, Description & Reviews Tabs -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-header bg-white border-bottom pt-3">
+            <ul class="nav nav-tabs card-header-tabs" id="productTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active fw-bold" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">
+                        <i class="bi bi-sliders me-1"></i> Technical Specifications
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">
+                        <i class="bi bi-card-text me-1"></i> Full Description
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+                        <i class="bi bi-chat-square-text me-1"></i> Customer Reviews ({{ product.reviews.count }})
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-4 tab-content" id="productTabsContent">
+            <!-- Specifications Tab -->
+            <div class="tab-pane fade show active" id="specs" role="tabpanel">
+                <h5 class="fw-bold mb-3">Complete Technical Data Sheet</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered spec-table mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Manufacturer / Brand</th>
+                                <td>{{ product.brand.name }} (Origin: {{ product.brand.origin_country }})</td>
+                            </tr>
+                            <tr>
+                                <th>Appliance Category</th>
+                                <td>{{ product.category.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Model Number / SKU</th>
+                                <td>{{ product.model_number }} / {{ product.sku }}</td>
+                            </tr>
+                            <tr>
+                                <th>Energy Efficiency Rating</th>
+                                <td><span class="badge bg-success">{{ product.energy_rating }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Appliance Capacity</th>
+                                <td>{{ product.capacity|default:"N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Power Requirements</th>
+                                <td>{{ product.power_consumption }}</td>
+                            </tr>
+                            <tr>
+                                <th>Dimensions (W x D x H)</th>
+                                <td>{{ product.dimensions|default:"Standard form factor" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Manufacturer Warranty</th>
+                                <td>{{ product.warranty }}</td>
+                            </tr>
+                            <!-- Dynamic specifications -->
+                            {% for spec in specifications %}
+                                <tr>
+                                    <th>{{ spec.spec_key }}</th>
+                                    <td>{{ spec.spec_value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Description Tab -->
+            <div class="tab-pane fade" id="desc" role="tabpanel">
+                <h5 class="fw-bold mb-3">Appliance Overview & Key Features</h5>
+                <div class="text-secondary lh-lg">
+                    {{ product.description|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Reviews Tab -->
+            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <h5 class="fw-bold mb-3">Customer Experiences</h5>
+                        {% for review in reviews %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold">{{ review.user.first_name|default:review.user.username }}</span>
+                                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <div class="text-orange mb-2 small">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-dark fw-bold ms-2">{{ review.headline }}</span>
+                                </div>
+                                <p class="text-secondary small mb-0">{{ review.comment }}</p>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No reviews yet for this appliance. Be the first to share your experience!</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Add Review Box -->
+                    <div class="col-lg-5">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <h6 class="fw-bold mb-3">Write a Customer Review</h6>
+                            {% if user.is_authenticated %}
+                                <form action="{% url 'store:add_review' product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Star Rating</label>
+                                        <select name="rating" class="form-select form-select-sm">
+                                            <option value="5">★★★★★ (5 Stars - Exceptional)</option>
+                                            <option value="4">★★★★☆ (4 Stars - Very Good)</option>
+                                            <option value="3">★★★☆☆ (3 Stars - Average)</option>
+                                            <option value="2">★★☆☆☆ (2 Stars - Disappointed)</option>
+                                            <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Review Headline</label>
+                                        <input type="text" name="headline" class="form-control form-control-sm" placeholder="e.g. Excellent cooling and whisper quiet" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Your Feedback</label>
+                                        <textarea name="comment" rows="3" class="form-control form-control-sm" placeholder="Tell other homeowners about installation, cooling, noise level, or energy bills..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm fw-bold w-100">
+                                        Submit Appliance Review
+                                    </button>
+                                </form>
+                            {% else %}
+                                <p class="small text-muted mb-3">Please sign in to your VoltCraft account to write an appliance review.</p>
+                                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-outline-primary btn-sm fw-bold w-100">
+                                    Sign In to Review
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI-Powered Similar Appliances (TF-IDF & Cosine Similarity) -->
+    {% if related_products %}
+        <div class="mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div>
+                    <h4 class="fw-extrabold mb-0">Similar Appliances</h4>
+                    <small class="text-muted">Recommendations matched by specs, capacity, brand & energy rating</small>
+                </div>
+            </div>
+            <div class="row g-4">
+                {% for related in related_products %}
+                    <div class="col-lg-3 col-md-6">
+                        {% include 'store/includes/product_card.html' with product=related %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recently Viewed Appliances (Customer Trail) -->
+    {% if recently_viewed %}
+        <div class="mb-4 pt-3 border-top">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-clock-history text-secondary me-2"></i>Recently Viewed by You
+                    </h5>
+                    <small class="text-muted">Appliances you previously checked out</small>
+                </div>
+                <a href="{% url 'store:recently_viewed' %}" class="small text-orange fw-bold text-decoration-none">
+                    View full history &rarr;
+                </a>
+            </div>
+            <div class="row g-4">
+                {% for item in recently_viewed %}
+                    <div class="col-lg-3 col-md-6">
+                        {% include 'store/includes/product_card.html' with product=item %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

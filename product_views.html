@@ -1,0 +1,235 @@
+{% extends 'portal/base_portal.html' %}
+{% load humanize %}
+
+{% block title %}Product Views & Traffic Analytics | VoltCraft Admin{% endblock %}
+
+{% block portal_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h4 class="fw-extrabold mb-1">Product Views &amp; Traffic Analytics</h4>
+        <p class="text-muted small mb-0">Live visitor engagement, browsing frequency, and top-viewed appliances.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <form action="{% url 'admin_portal:product_views_clear' %}" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to delete all view tracking history?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-bold rounded-pill">
+                <i class="bi bi-trash3 me-1"></i> Clear View Logs
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 1. Key Engagement Stat Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="portal-stat-card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper rounded-3 bg-primary bg-opacity-10 text-primary p-3">
+                    <i class="bi bi-eye fs-3"></i>
+                </div>
+                <div>
+                    <h3 class="fw-extrabold mb-0 text-dark">{{ total_views }}</h3>
+                    <span class="text-muted small fw-semibold">Total Product Views</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="portal-stat-card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper rounded-3 bg-success bg-opacity-10 text-success p-3">
+                    <i class="bi bi-person-check fs-3"></i>
+                </div>
+                <div>
+                    <h3 class="fw-extrabold mb-0 text-dark">{{ unique_users }}</h3>
+                    <span class="text-muted small fw-semibold">Registered Shoppers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="portal-stat-card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper rounded-3 bg-secondary bg-opacity-10 text-secondary p-3">
+                    <i class="bi bi-incognito fs-3"></i>
+                </div>
+                <div>
+                    <h3 class="fw-extrabold mb-0 text-dark">{{ unique_guests }}</h3>
+                    <span class="text-muted small fw-semibold">Anonymous Guests</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="portal-stat-card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon-wrapper rounded-3 bg-info bg-opacity-10 text-info p-3">
+                    <i class="bi bi-bar-chart-line fs-3"></i>
+                </div>
+                <div>
+                    <h3 class="fw-extrabold mb-0 text-dark">{{ top_viewed_products|length }}</h3>
+                    <span class="text-muted small fw-semibold">Active Trend Items</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Most Viewed Appliances Leaderboard -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+    <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+        <h6 class="fw-extrabold m-0 text-dark">
+            <i class="bi bi-trophy text-orange me-2"></i>Most Viewed Appliances (Popularity Leaderboard)
+        </h6>
+        <span class="badge bg-light text-dark border">Top 10 High-Demand Items</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small text-muted text-uppercase">
+                <tr>
+                    <th class="ps-3">Rank</th>
+                    <th>Appliance</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th class="text-center">Total Views</th>
+                    <th class="text-end pe-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod in top_viewed_products %}
+                    <tr>
+                        <td class="ps-3 fw-bold text-muted">#{{ forloop.counter }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{{ prod.get_image_url }}" alt="{{ prod.title }}" class="rounded-2 border" style="width: 42px; height: 42px; object-fit: contain;">
+                                <div>
+                                    <strong class="d-block text-dark small">{{ prod.title|truncatechars:45 }}</strong>
+                                    <span class="text-muted" style="font-size: 0.72rem;">SKU: {{ prod.sku }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ prod.category.name }}</span></td>
+                        <td>{{ prod.brand.name }}</td>
+                        <td><strong class="text-dark">₹{{ prod.current_price|floatformat:0|intcomma }}</strong></td>
+                        <td>
+                            {% if prod.stock > 5 %}
+                                <span class="badge bg-success-subtle text-success">{{ prod.stock }} units</span>
+                            {% elif prod.stock > 0 %}
+                                <span class="badge bg-danger-subtle text-danger">{{ prod.stock }} low</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger">Out of stock</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary px-3 py-1 rounded-pill fs-6">{{ prod.view_count }}</span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a href="{% url 'admin_portal:product_edit' prod.id %}" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Edit Appliance">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ prod.get_absolute_url }}" target="_blank" class="btn btn-sm btn-outline-primary py-1 px-2" title="View Storefront">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="bi bi-eye-slash fs-3 d-block mb-1 opacity-50"></i>
+                            No appliance views recorded yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 3. Real-Time View Activity Stream Logs -->
+<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+    <div class="card-header bg-white border-bottom p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <h6 class="fw-extrabold m-0 text-dark">
+            <i class="bi bi-activity text-primary me-2"></i>Real-Time Visitor Browsing Logs
+        </h6>
+        <form method="GET" class="d-flex align-items-center gap-2">
+            <input type="text" name="q" value="{{ query|default:'' }}" class="form-control form-control-sm" placeholder="Search by appliance, user, or session..." style="min-width: 260px;">
+            <button type="submit" class="btn btn-sm btn-primary px-3">Filter</button>
+            {% if query %}
+                <a href="{% url 'admin_portal:product_views' %}" class="btn btn-sm btn-outline-secondary">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small text-muted text-uppercase">
+                <tr>
+                    <th class="ps-3">Timestamp</th>
+                    <th>Appliance</th>
+                    <th>User / Visitor</th>
+                    <th>Session Key</th>
+                    <th class="text-end pe-3">Direct Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in page_obj.object_list %}
+                    <tr>
+                        <td class="ps-3 text-muted small">
+                            <i class="bi bi-clock me-1"></i> {{ log.viewed_at|date:"d M Y, H:i" }}
+                        </td>
+                        <td>
+                            <strong class="text-dark small">{{ log.product.title|truncatechars:50 }}</strong>
+                            <small class="text-muted d-block">{{ log.product.category.name }}</small>
+                        </td>
+                        <td>
+                            {% if log.user %}
+                                <span class="badge bg-success-subtle text-success small px-2 py-1">
+                                    <i class="bi bi-person-fill me-1"></i>{{ log.user.username }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary small px-2 py-1">
+                                    <i class="bi bi-globe me-1"></i>Guest Visitor
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <code class="small text-muted">{{ log.session_key|default:"-"|truncatechars:18 }}</code>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a href="{{ log.product.get_absolute_url }}" target="_blank" class="small text-orange fw-bold text-decoration-none">
+                                View Page &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No browsing logs found matching your criteria.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div class="p-3 border-top d-flex justify-content-between align-items-center">
+            <small class="text-muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</small>
+            <ul class="pagination pagination-sm m-0">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo;</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

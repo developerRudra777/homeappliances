@@ -1,0 +1,200 @@
+{% extends 'portal/base_portal.html' %}
+{% load humanize %}
+
+{% block title %}Order #{{ order.order_number }} | VoltCraft Administration{% endblock %}
+
+{% block portal_content %}
+<div class="mb-4">
+    <a href="{% url 'admin_portal:orders' %}" class="btn btn-outline-secondary btn-sm mb-2">
+        &laquo; Back to Orders
+    </a>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h4 class="fw-extrabold mb-0">Order #{{ order.order_number }}</h4>
+        {% if order.status == 'PENDING' %}
+            <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle fs-6 px-3 py-2 rounded-pill">
+                <i class="bi bi-clock-history me-1"></i> {{ order.get_status_display }}
+            </span>
+        {% elif order.status == 'CONFIRMED' %}
+            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fs-6 px-3 py-2 rounded-pill">
+                <i class="bi bi-check2-circle me-1"></i> {{ order.get_status_display }}
+            </span>
+        {% elif order.status == 'SHIPPED' %}
+            <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle fs-6 px-3 py-2 rounded-pill">
+                <i class="bi bi-truck me-1"></i> {{ order.get_status_display }}
+            </span>
+        {% elif order.status == 'DELIVERED' %}
+            <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle fs-6 px-3 py-2 rounded-pill">
+                <i class="bi bi-patch-check-fill me-1"></i> {{ order.get_status_display }}
+            </span>
+        {% elif order.status == 'CANCELLED' %}
+            <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle fs-6 px-3 py-2 rounded-pill">
+                <i class="bi bi-x-circle me-1"></i> {{ order.get_status_display }}
+            </span>
+        {% else %}
+            <span class="badge bg-secondary-subtle text-secondary-emphasis border fs-6 px-3 py-2 rounded-pill">
+                {{ order.get_status_display|default:order.status }}
+            </span>
+        {% endif %}
+    </div>
+    {% if order.status == 'CANCELLED' %}
+        <div class="alert alert-danger mb-4 rounded-3 p-3 mt-3">
+            <strong><i class="bi bi-x-circle me-1"></i> Order Cancelled on {{ order.cancelled_at|date:"d M Y, h:i A"|default:"N/A" }}</strong>
+            <div class="small text-muted mt-1">Reason: {{ order.cancellation_reason|default:"No reason specified" }}</div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Ordered Items & Shipping Details -->
+    <div class="col-lg-8">
+        <!-- Order Items -->
+        <div class="portal-card mb-4">
+            <div class="p-3 border-bottom">
+                <h6 class="fw-bold mb-0">Appliance Items in Order</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th class="ps-3">Appliance</th>
+                            <th>Model</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th class="text-end pe-3">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td class="ps-3 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ item.product.get_image_url }}" alt="" class="rounded border p-1" style="width: 44px; height: 44px; object-fit: contain;">
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">{{ item.product.brand.name }} {{ item.product.title }}</span>
+                                            <small class="text-muted">{{ item.product.capacity }} | {{ item.product.warranty }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><code>{{ item.product.model_number|default:item.product.sku }}</code></td>
+                                <td>₹{{ item.price|floatformat:2|intcomma }}</td>
+                                <td><strong>{{ item.quantity }}</strong></td>
+                                <td class="text-end pe-3 fw-bold text-primary">₹{{ item.total_price|floatformat:2|intcomma }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Customer & Delivery Address -->
+        <div class="portal-card p-4 mb-4">
+            <h6 class="fw-bold mb-3 border-bottom pb-2">Customer & Logistics Details</h6>
+            <div class="row g-3 small">
+                <div class="col-md-6">
+                    <span class="text-muted d-block">Customer Name:</span>
+                    <strong class="text-dark fs-6">{{ order.full_name }}</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block">Phone Number:</span>
+                    <strong class="text-dark">{{ order.phone }}</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block">Email Address:</span>
+                    <strong class="text-dark">{{ order.email }}</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block">Order Placed Date:</span>
+                    <strong class="text-dark">{{ order.created_at|date:"F d, Y - h:i A" }}</strong>
+                </div>
+                <div class="col-12 border-top pt-2">
+                    <span class="text-muted d-block">Destination Address:</span>
+                    <div class="text-dark fw-semibold">
+                        {{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>
+                        {{ order.city }}, {{ order.state }} {{ order.postal_code }}, {{ order.country }}
+                    </div>
+                </div>
+                {% if order.delivery_instructions %}
+                    <div class="col-12 border-top pt-2">
+                        <span class="text-muted d-block">Special Delivery / Elevator Notes:</span>
+                        <div class="p-2 bg-light rounded text-dark">{{ order.delivery_instructions }}</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status Updater & Payment Breakdown -->
+    <div class="col-lg-4">
+        <!-- Status Update Card -->
+        <div class="portal-card p-4 mb-4">
+            <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-arrow-repeat text-primary me-1"></i> Update Order Status</h6>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Fulfillment Status</label>
+                    <select name="status" class="form-select">
+                        {% for code, label in status_choices %}
+                            <option value="{{ code }}" {% if order.status == code %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Cancellation Reason (if cancelling)</label>
+                    <input type="text" name="cancellation_reason" class="form-control form-control-sm" placeholder="e.g. Customer requested via phone, out of stock" value="{{ order.cancellation_reason|default:'' }}">
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_paid" id="isPaidCheck" {% if order.is_paid %}checked{% endif %}>
+                    <label class="form-check-label small fw-bold" for="isPaidCheck">
+                        Mark payment as received (PAID)
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">
+                    Save Status Update
+                </button>
+            </form>
+        </div>
+
+        <!-- Billing Breakdown -->
+        <div class="portal-card p-4">
+            <h6 class="fw-bold mb-3 border-bottom pb-2">Financial Breakdown</h6>
+            <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">Subtotal:</span>
+                <span class="fw-bold">₹{{ order.subtotal|floatformat:2|intcomma }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">Delivery Fee:</span>
+                <span class="fw-bold">₹{{ order.shipping_fee|floatformat:2|intcomma }}</span>
+            </div>
+            {% if order.discount_amount > 0 %}
+            <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">Coupon Discount{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}:</span>
+                <span class="fw-bold text-success">- ₹{{ order.discount_amount|floatformat:2|intcomma }}</span>
+            </div>
+            {% endif %}
+            <hr class="my-2">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="fw-bold fs-6">Total Amount:</span>
+                <span class="fw-extrabold fs-5 text-primary">₹{{ order.total_amount|floatformat:2|intcomma }}</span>
+            </div>
+            <div class="p-2 bg-light rounded text-center small text-muted mb-3">
+                Payment Method: <strong>{{ order.get_payment_method_display }}</strong>
+                {% if order.upi_id %}
+                    <div class="mt-1 text-primary fw-bold">UPI ID: {{ order.upi_id }}</div>
+                {% elif order.card_last_digits %}
+                    <div class="mt-1 text-dark fw-bold">Card ending in •••• {{ order.card_last_digits }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Delete Order Button -->
+            <form method="POST" action="{% url 'admin_portal:order_delete' order.order_number %}" onsubmit="return confirm('Permanently delete order #{{ order.order_number }}? This action cannot be undone.');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger w-100 fw-bold btn-sm">
+                    <i class="bi bi-trash me-1"></i> Delete Order Record
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page_title|default:"Admin Portal" }} | HomeHub Administration{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 & Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Dedicated Admin Portal CSS Matching Screenshot -->
+    <link rel="stylesheet" href="{% static 'css/admin_portal.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="portal-body-wrapper">
+
+    <!-- 1. Dark Sidebar (#111111) Matching Screenshot -->
+    <aside class="portal-sidebar">
+        
+        <!-- Brand Logo Header -->
+        <a href="{% url 'admin_portal:dashboard' %}" class="portal-sidebar-brand">
+            <div class="portal-brand-roof-icon">
+                <i class="bi bi-house-door-fill text-orange"></i>
+            </div>
+            <div>
+                <h5>Home Hub</h5>
+                <span class="brand-sub">Home Appliances</span>
+            </div>
+        </a>
+
+        <!-- Sidebar Navigation Menu -->
+        <ul class="portal-nav-list">
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:dashboard' %}" class="{% if active_menu == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:products' %}" class="{% if active_menu == 'products' %}active{% endif %}">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:categories' %}" class="{% if active_menu == 'categories' %}active{% endif %}">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:orders' %}" class="{% if active_menu == 'orders' %}active{% endif %}">
+                    <i class="bi bi-cart3"></i>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:customers' %}" class="{% if active_menu == 'customers' %}active{% endif %}">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:inventory' %}" class="{% if active_menu == 'inventory' %}active{% endif %}">
+                    <i class="bi bi-boxes"></i>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:product_views' %}" class="{% if active_menu == 'product_views' %}active{% endif %}">
+                    <i class="bi bi-eye"></i>
+                    <span>Product Views</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:coupons' %}" class="{% if active_menu == 'coupons' %}active{% endif %}">
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span>Coupons</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:banners' %}" class="{% if active_menu == 'banners' %}active{% endif %}">
+                    <i class="bi bi-image"></i>
+                    <span>Banners</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:reviews' %}" class="{% if active_menu == 'reviews' %}active{% endif %}">
+                    <i class="bi bi-chat-square-text"></i>
+                    <span>Reviews</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:feedback_list' %}" class="{% if active_menu == 'customer_feedback' %}active{% endif %}">
+                    <i class="bi bi-chat-heart"></i>
+                    <span>Customer Feedback</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:dashboard' %}" class="{% if active_menu == 'reports' %}active{% endif %}">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li class="portal-nav-item">
+                <a href="{% url 'admin_portal:settings' %}" class="{% if active_menu == 'settings' %}active{% endif %}">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Sidebar Footer -->
+        <div class="portal-sidebar-footer">
+            <form action="{% url 'accounts:logout' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="portal-sidebar-logout border-0 bg-transparent w-100 text-start">
+                    <i class="bi bi-box-arrow-left fs-5"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
+            <div class="portal-subtagline">
+                <strong class="text-white">Home Hub</strong><br>
+                Better Homes. Brighter Lives.
+            </div>
+        </div>
+    </aside>
+
+    <!-- 2. Main Portal Wrapper (Canvas #F6F2EB) -->
+    <div class="portal-main-wrapper">
+        
+        <!-- Top Header Bar -->
+        <header class="portal-topbar">
+            <!-- Search Bar in Center/Left -->
+            <form class="portal-search-box" action="{% url 'admin_portal:products' %}" method="GET">
+                <i class="bi bi-search text-muted me-2"></i>
+                <input type="text" name="q" placeholder="Search products, orders, customers...">
+                <button type="submit">Search</button>
+            </form>
+
+            <!-- Right Actions: Notifications & Admin Profile -->
+            <div class="portal-topbar-actions">
+                <a href="{% url 'admin_portal:orders' %}?status=PENDING" class="portal-notif-btn" title="Pending Orders">
+                    <i class="bi bi-bell"></i>
+                    {% if pending_orders_count and pending_orders_count > 0 %}
+                        <span class="portal-notif-badge">{{ pending_orders_count }}</span>
+                    {% endif %}
+                </a>
+
+                <div class="portal-admin-profile">
+                    <div class="portal-admin-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <div class="portal-admin-name">{{ user.username|default:"Admin"|capfirst }}</div>
+                        <div class="portal-admin-role">Super Admin</div>
+                    </div>
+                </div>
+
+                <a href="{% url 'store:home' %}" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold ms-2" target="_blank" title="Open Storefront">
+                    <i class="bi bi-shop me-1"></i> Storefront
+                </a>
+            </div>
+        </header>
+
+        <!-- Flash Alert Messages -->
+        <div class="px-4 pt-2">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 border-0 shadow-xs small mb-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close shadow-none small" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Main Body Content -->
+        <main class="portal-content-body">
+            {% block portal_content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Bootstrap 5.3 Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

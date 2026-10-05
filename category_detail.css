@@ -1,0 +1,83 @@
+/* ==========================================================================
+   HomeHub Category Detail Stylesheet (category_detail.css)
+   Theme: Fresh Lime Green (#65A30D) & Clean Crisp White (#FFFFFF)
+   ========================================================================== */
+
+.category-banner {
+    background: radial-gradient(circle at 75% 30%, #1A261E 0%, #111713 100%);
+    border-radius: 28px;
+    color: #FFFFFF;
+    padding: 3rem 2.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.35);
+}
+
+.category-banner::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(132, 204, 22, 0.30) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.cat-icon-large {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #84CC16;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.filter-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px solid #E5ECE0;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.filter-title {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 800;
+    color: #64748B;
+    margin-bottom: 0.75rem;
+}
+
+.other-cat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1.1rem;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 9999px;
+    color: #1E293B;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.other-cat-chip:hover {
+    background: #65A30D;
+    color: #FFFFFF;
+    border-color: #65A30D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(101, 163, 13, 0.28);
+}

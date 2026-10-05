@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Recently Viewed Appliances | HomeHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Recently Viewed</li>
+        </ol>
+    </nav>
+
+    <!-- Header Banner -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 p-4 bg-white rounded-4 border mb-4 shadow-xs">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-clock-history fs-3 text-primary"></i>
+                <h3 class="fw-extrabold text-dark m-0">Your Recently Viewed Appliances</h3>
+            </div>
+            <p class="text-muted small m-0">Revisit the smart home appliances you've explored in this shopping session.</p>
+        </div>
+        {% if appliances %}
+            <form action="{% url 'store:clear_recently_viewed' %}" method="POST" onsubmit="return confirm('Are you sure you want to clear your browsing history?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-bold rounded-pill">
+                    <i class="bi bi-trash3 me-1"></i> Clear History
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <!-- Product Grid -->
+    {% if appliances %}
+        <div class="row g-4 mb-4">
+            {% for product in appliances %}
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                    <div class="card h-100 border rounded-4 shadow-sm overflow-hidden bg-white d-flex flex-column">
+                        <div class="position-relative bg-light text-center p-3">
+                            <span class="badge bg-secondary position-absolute top-0 start-0 m-2 rounded-pill px-2 py-1 small" style="font-size: 0.68rem;">
+                                <i class="bi bi-eye-fill me-1"></i>Viewed
+                            </span>
+                            {% if product.discount_percent %}
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-2 py-1 small" style="font-size: 0.68rem;">
+                                    -{{ product.discount_percent }}% OFF
+                                </span>
+                            {% endif %}
+                            <a href="{{ product.get_absolute_url }}">
+                                <img src="{{ product.get_image_url }}" alt="{{ product.title }}" class="img-fluid" style="height: 180px; object-fit: contain;">
+                            </a>
+                        </div>
+                        <div class="p-3 d-flex flex-column flex-grow-1">
+                            <div class="text-muted small mb-1">{{ product.category.name }} &bull; {{ product.brand.name }}</div>
+                            <h6 class="fw-bold mb-2 text-dark" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.6rem;">
+                                <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">
+                                    {{ product.title }}
+                                </a>
+                            </h6>
+                            <div class="mb-2 small text-orange">
+                                <span>★★★★★</span>
+                                <span class="text-muted ms-1">({{ product.review_count|default:"0" }})</span>
+                            </div>
+                            <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="fs-5 text-dark">₹{{ product.current_price|floatformat:0|intcomma }}</strong>
+                                    {% if product.price > product.current_price %}
+                                        <small class="text-muted text-decoration-line-through d-block">₹{{ product.price|floatformat:0|intcomma }}</small>
+                                    {% endif %}
+                                </div>
+                                <form action="{% url 'cart:cart_add' product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">
+                                        <i class="bi bi-cart-plus me-1"></i> Add
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty Browsing State -->
+        <div class="card border-0 rounded-4 shadow-sm p-5 text-center bg-white my-4">
+            <div class="rounded-circle bg-light d-inline-flex p-4 mx-auto mb-3 text-muted">
+                <i class="bi bi-clock-history fs-1 text-primary"></i>
+            </div>
+            <h4 class="fw-extrabold text-dark mb-1">No Recently Viewed Appliances</h4>
+            <p class="text-muted small mx-auto mb-4" style="max-width: 480px;">
+                You haven't viewed any appliances yet. Browse our selection of refrigerators, washing machines, air conditioners, and kitchen appliances!
+            </p>
+            <div>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary px-4 py-2 fw-bold rounded-pill">
+                    <i class="bi bi-grid me-1"></i> Explore Appliance Catalog
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

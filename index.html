@@ -1,0 +1,485 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}HomeHub | Smart Appliances for a Better Home{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- 1. Hero Section (Image 1 Style) -->
+    <section class="mb-5 pt-2">
+        <div class="row align-items-center g-4">
+            
+            <!-- Left Hero Content -->
+            <div class="col-lg-6">
+                <div class="hero-tag-pill mb-3">
+                    <span>&bull;</span> NEW SEASON COLLECTION
+                </div>
+                <h1 class="hero-main-title mb-3">
+                    Appliances that<br>
+                    <span class="text-orange">work as hard</span> as<br>
+                    you do.
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    Handpicked refrigerators, washers, air conditioners and kitchen gear &mdash; with doorstep delivery, expert installation and honest prices.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{% url 'store:product_list' %}" class="btn btn-primary px-4 py-3 fw-bold">
+                        Shop the collection &rarr;
+                    </a>
+                    <a href="{% url 'store:product_list' %}?discount=true" class="btn btn-outline-dark px-4 py-3 fw-bold">
+                        Today's deals
+                    </a>
+                </div>
+
+                <!-- Trust Metrics Strip -->
+                <div class="hero-metrics-strip">
+                    <div class="metric-item">
+                        <strong>12k+</strong>
+                        <span>Happy homes</span>
+                    </div>
+                    <div class="metric-item">
+                        <strong>4.8 &starf;</strong>
+                        <span>Average rating</span>
+                    </div>
+                    <div class="metric-item">
+                        <strong>48 hr</strong>
+                        <span>Metro delivery</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Hero Dark Showcase Card with Vector Appliance Graphics -->
+            <div class="col-lg-6">
+                <div class="hero-dark-showcase">
+                    <!-- Floating Top Badge -->
+                    <div class="hero-badge-floating-top">
+                        <i class="bi bi-shield-check text-primary me-1"></i> Energy saver picks
+                    </div>
+
+                    <!-- Floating Circular Discount Sticker -->
+                    <div class="hero-badge-discount-circle">
+                        <span>UP TO</span>
+                        <strong>45%</strong>
+                        <span>OFF</span>
+                    </div>
+
+                    <!-- Modern Appliances Graphic Composite -->
+                    <div class="d-flex align-items-end justify-content-center gap-4 py-4" style="z-index: 1;">
+                        <!-- Stylized Washer -->
+                        <div class="p-3 bg-white rounded-4 shadow-lg text-center" style="width: 155px; height: 195px;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div class="rounded-circle bg-primary" style="width: 8px; height: 8px;"></div>
+                                <div class="d-flex gap-1">
+                                    <div class="rounded-circle bg-secondary" style="width: 6px; height: 6px;"></div>
+                                    <div class="rounded-circle bg-secondary" style="width: 6px; height: 6px;"></div>
+                                </div>
+                            </div>
+                            <!-- Circular Drum -->
+                            <div class="rounded-circle mx-auto my-2 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; background: #1e293b; border: 5px solid #e2e8f0; box-shadow: inset 0 4px 8px rgba(0,0,0,0.4);">
+                                <div class="rounded-circle" style="width: 55px; height: 55px; background: radial-gradient(circle, #38bdf8 0%, #0f172a 70%); opacity: 0.85;"></div>
+                            </div>
+                            <span class="small fw-bold text-dark" style="font-size: 0.72rem;">Smart Washer</span>
+                        </div>
+
+                        <!-- Stylized Orange Refrigerator -->
+                        <div class="rounded-4 shadow-lg d-flex flex-column justify-content-between p-2 text-white" style="width: 140px; height: 260px; background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%);">
+                            <!-- Top Freezer Door -->
+                            <div class="bg-black bg-opacity-10 rounded-3 p-2 d-flex justify-content-end" style="height: 90px;">
+                                <div class="bg-white rounded-pill" style="width: 4px; height: 40px; opacity: 0.8;"></div>
+                            </div>
+                            <div class="my-1 border-top border-white border-opacity-25"></div>
+                            <!-- Bottom Fridge Door -->
+                            <div class="bg-black bg-opacity-10 rounded-3 p-2 d-flex justify-content-end align-items-center" style="height: 140px;">
+                                <div class="bg-white rounded-pill" style="width: 4px; height: 50px; opacity: 0.8;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Bottom Badge -->
+                    <div class="hero-badge-floating-bottom">
+                        <i class="bi bi-check-circle-fill me-1"></i> Free installation
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Nav & Feature Shortcuts Strip (User-Friendly Navigation) -->
+    <div class="row g-2 g-md-3 mb-5">
+        <div class="col-6 col-md-3">
+            <a href="{% url 'store:categories_list' %}" class="card border-0 shadow-sm rounded-4 p-3 text-decoration-none text-dark h-100 bg-white hover-shadow transition">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; min-width: 44px; background: #F7FEE7; color: #65A30D;">
+                        <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold small text-dark">Categories</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Browse Departments</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'store:product_list' %}" class="card border-0 shadow-sm rounded-4 p-3 text-decoration-none text-dark h-100 bg-white hover-shadow transition">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; min-width: 44px; background: #FEF3C7; color: #D97706;">
+                        <i class="bi bi-grid-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold small text-dark">All Products</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Explore Full Catalog</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'store:product_list' %}?discount=true" class="card border-0 shadow-sm rounded-4 p-3 text-decoration-none text-dark h-100 bg-white hover-shadow transition">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; min-width: 44px; background: #FEE2E2; color: #DC2626;">
+                        <i class="bi bi-tag-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold small text-dark">Today's Deals</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Up to 45% Discount</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'orders:order_history' %}" class="card border-0 shadow-sm rounded-4 p-3 text-decoration-none text-dark h-100 bg-white hover-shadow transition">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; min-width: 44px; background: #ECFDF5; color: #059669;">
+                        <i class="bi bi-truck fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold small text-dark">Track Order</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Delivery Status</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. Dynamic Top Category Slide Board / Horizontal Slider -->
+    <section class="cat-slider-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="fw-extrabold fs-4 m-0">Explore Categories</h3>
+                <small class="text-muted">Slide through all available appliance departments</small>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{% url 'store:categories_list' %}" class="text-orange fw-bold text-decoration-none small">
+                    View all categories &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Slider Control Buttons -->
+        <button type="button" class="cat-slider-btn prev" onclick="slideCategories(-1)" aria-label="Slide Left">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button type="button" class="cat-slider-btn next" onclick="slideCategories(1)" aria-label="Slide Right">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+
+        <!-- Horizontal Slide Track (100% Dynamic from Database) -->
+        <div class="cat-slider-track" id="categorySliderTrack">
+            {% for cat in categories %}
+                <a href="{% url 'store:category_detail' cat.slug %}" class="cat-slide-card">
+                    <div class="cat-slide-icon">
+                        <i class="bi {{ cat.icon|default:'bi-grid' }}"></i>
+                    </div>
+                    <div class="cat-slide-name" title="{{ cat.name }}">{{ cat.name }}</div>
+                    <span class="cat-slide-count">{{ cat.products.count|default:"0" }} items</span>
+                </a>
+            {% empty %}
+                <div class="p-3 bg-white rounded-4 border text-muted small">
+                    Explore our appliances catalog to view all categories.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 2.5 AI-Powered Personalized Recommendations Section -->
+    {% if ai_recommendations %}
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="fw-extrabold fs-4 m-0">Recommended For You</h3>
+                <small class="text-muted">Smart picks tailored to your preferences</small>
+            </div>
+            <a href="{% url 'store:product_list' %}" class="text-orange fw-bold text-decoration-none small">
+                Explore all &rarr;
+            </a>
+        </div>
+
+        <div class="row g-3">
+            {% for product in ai_recommendations %}
+                <div class="col-xl-3 col-md-6 col-sm-6">
+                    <div class="deal-product-card position-relative">
+                        <div class="deal-image-wrapper">
+                            {% if product.discount_percent %}
+                                <span class="badge-discount-pill">-{{ product.discount_percent }}% OFF</span>
+                            {% endif %}
+                            <a href="{{ product.get_absolute_url }}">
+                                <img src="{{ product.get_image_url }}" alt="{{ product.title }}">
+                            </a>
+                        </div>
+                        <div class="deal-title" title="{{ product.title }}">
+                            <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">
+                                {{ product.title }}
+                            </a>
+                        </div>
+                        <div class="deal-rating">
+                            <span>&starf;&starf;&starf;&starf;&starf;</span>
+                            <span class="review-count">({{ product.review_count|default:"0" }} reviews)</span>
+                        </div>
+                        <div class="deal-price-row">
+                            <span class="deal-price-current">₹{{ product.current_price|floatformat:0|intcomma }}</span>
+                            {% if product.price > product.current_price %}
+                                <span class="deal-price-mrp">₹{{ product.price|floatformat:0|intcomma }}</span>
+                            {% endif %}
+                        </div>
+                        <form action="{% url 'cart:cart_add' product.id %}" method="POST" class="mt-auto">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="deal-add-cart-btn">
+                                Add to cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 3. Dynamic Products Showcase (Rendered when products exist) -->
+    {% if featured_products %}
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="fw-extrabold fs-4 m-0">Deal of the day</h3>
+                <small class="text-muted">Dynamic verified appliances in stock</small>
+            </div>
+            <a href="{% url 'store:product_list' %}" class="text-orange fw-bold text-decoration-none small">
+                See all products &rarr;
+            </a>
+        </div>
+
+        <div class="row g-3">
+            {% for product in featured_products %}
+                <div class="col-xl-3 col-md-6 col-sm-6">
+                    <div class="deal-product-card">
+                        <div class="deal-image-wrapper">
+                            {% if product.discount_percentage %}
+                                <span class="badge-discount-pill">-{{ product.discount_percentage }}% TODAY</span>
+                            {% endif %}
+                            <img src="{{ product.get_image_url }}" alt="{{ product.title }}">
+                        </div>
+                        <div class="deal-title" title="{{ product.title }}">
+                            {{ product.title }}
+                        </div>
+                        <div class="deal-rating">
+                            <span>&starf;&starf;&starf;&starf;&starf;</span>
+                            <span class="review-count">({{ product.reviews_count|default:"0" }} reviews)</span>
+                        </div>
+                        <div class="deal-price-row">
+                            <span class="deal-price-current">₹{{ product.current_price|floatformat:0|intcomma }}</span>
+                            {% if product.mrp > product.current_price %}
+                                <span class="deal-price-mrp">₹{{ product.mrp|floatformat:0|intcomma }}</span>
+                            {% endif %}
+                        </div>
+                        <form action="{% url 'cart:cart_add' product.id %}" method="POST" class="mt-auto">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="deal-add-cart-btn">
+                                Add to cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 4. Value Proposition Dark Banner (Image 1 Style) -->
+    <div class="value-prop-banner">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="prop-card">
+                    <div class="prop-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div>
+                        <h6>48-hour metro delivery</h6>
+                        <p>Order today, unbox this week. Real-time tracking on every shipment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="prop-card">
+                    <div class="prop-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <h6>2-year full warranty</h6>
+                        <p>Every appliance covered, with doorstep service &mdash; no fine print.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="prop-card">
+                    <div class="prop-icon">
+                        <i class="bi bi-credit-card-2-front"></i>
+                    </div>
+                    <div>
+                        <h6>No-cost EMI from ₹1,099</h6>
+                        <p>Split payments over 3–24 months with all major cards and UPI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4.5 Customer Feedback & Testimonials Highlight -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <div>
+                <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-1">
+                    <i class="bi bi-chat-heart-fill me-1"></i> Customer Experiences
+                </span>
+                <h3 class="fw-extrabold fs-4 m-0 text-dark">What Our Customers Say</h3>
+                <small class="text-muted">Real ratings and feedback from verified appliance buyers</small>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'store:customer_feedback' %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">
+                    <i class="bi bi-chat-dots me-1"></i> View All Feedback &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="p-3 rounded-4 bg-light h-100 border">
+                    <div class="text-warning small mb-2">★★★★★</div>
+                    <div class="fw-bold small text-dark mb-1">Super fast delivery &amp; installation!</div>
+                    <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;">"The double door refrigerator arrived within 24 hours. The technician set it up and explained the temperature controls. Truly hassle-free!"</p>
+                    <div class="small fw-semibold text-dark">&mdash; Kabir Hossain <span class="badge bg-success-subtle text-success ms-1 small">Verified Buyer</span></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-4 bg-light h-100 border">
+                    <div class="text-warning small mb-2">★★★★★</div>
+                    <div class="fw-bold small text-dark mb-1">Quiet &amp; powerful washing machine</div>
+                    <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;">"Purchased the front load washer. Clothes come out completely clean and it consumes very little power. Support team was very helpful."</p>
+                    <div class="small fw-semibold text-dark">&mdash; Pooja Sharma <span class="badge bg-success-subtle text-success ms-1 small">Verified Buyer</span></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-4 bg-light h-100 border">
+                    <div class="text-warning small mb-2">★★★★★</div>
+                    <div class="fw-bold small text-dark mb-1">Easy payment with Cash on Delivery</div>
+                    <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;">"Selected Cash on Delivery at checkout and paid after the appliance was unpacked in my home. Very trustworthy service."</p>
+                    <div class="small fw-semibold text-dark">&mdash; Tanvir Ahmed <span class="badge bg-success-subtle text-success ms-1 small">Verified Buyer</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4.6 Frequently Asked Questions (FAQ Accordion) -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white">
+        <div class="text-center mb-4">
+            <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-bold mb-2">
+                <i class="bi bi-question-circle-fill me-1"></i> Help &amp; FAQs
+            </span>
+            <h3 class="fw-extrabold fs-4 text-dark mb-1">Frequently Asked Questions</h3>
+            <p class="text-muted small mb-0">Quick answers to common questions about orders, payments, and installation</p>
+        </div>
+
+        <div class="accordion accordion-flush" id="faqAccordion">
+            <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                <h2 class="accordion-header" id="faqHeading1">
+                    <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                        <i class="bi bi-truck text-primary me-2 fs-5"></i> How fast is delivery and what are the delivery charges?
+                    </button>
+                </h2>
+                <div id="faqCollapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small pt-0 pb-3" style="line-height: 1.6;">
+                        All major appliances feature <strong>FREE home delivery</strong> across metro areas within 24 to 48 hours. After placing your order, you can track shipment progress in real time using your unique Order ID.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                <h2 class="accordion-header" id="faqHeading2">
+                    <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                        <i class="bi bi-tools text-warning-emphasis me-2 fs-5"></i> Is installation free and how is it scheduled?
+                    </button>
+                </h2>
+                <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small pt-0 pb-3" style="line-height: 1.6;">
+                        Yes! Upon delivery of refrigerators, washing machines, and air conditioners, our certified technician provides free unboxing, professional installation, and a comprehensive demonstration.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                <h2 class="accordion-header" id="faqHeading3">
+                    <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                        <i class="bi bi-wallet2 text-success me-2 fs-5"></i> What payment options and Cash on Delivery (COD) methods are available?
+                    </button>
+                </h2>
+                <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small pt-0 pb-3" style="line-height: 1.6;">
+                        We support 100% secure payments via Razorpay including <strong>UPI (GPay, PhonePe, Paytm), Credit &amp; Debit Cards, Net Banking</strong>, as well as <strong>Cash on Delivery (COD)</strong>. You can comfortably pay once your appliance arrives at your doorstep.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                <h2 class="accordion-header" id="faqHeading4">
+                    <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4">
+                        <i class="bi bi-patch-check text-success me-2 fs-5"></i> How does warranty and customer support work?
+                    </button>
+                </h2>
+                <div id="faqCollapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small pt-0 pb-3" style="line-height: 1.6;">
+                        Every product comes with an official manufacturer warranty card and a GST invoice. For questions or support, call our toll-free line at <strong>1800-123-4567</strong> or submit your thoughts on our <strong>Customer Feedback</strong> page for quick assistance.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Get the good deals first Orange Newsletter (Image 1 Style) -->
+    <div class="newsletter-orange-banner">
+        <h3>Get the good deals first</h3>
+        <p>One useful email a week &mdash; price drops, restocks and buying guides. No spam.</p>
+        <form class="newsletter-input-group" onsubmit="event.preventDefault(); alert('Thank you for subscribing to HomeHub deals!');">
+            <input type="email" placeholder="you@example.com" required>
+            <button type="submit">Subscribe</button>
+        </form>
+    </div>
+
+</div>
+
+<!-- Interactive Category Slide Board Script -->
+<script>
+function slideCategories(direction) {
+    const track = document.getElementById('categorySliderTrack');
+    if (track) {
+        const scrollAmount = 320;
+        track.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+}
+</script>
+{% endblock %}

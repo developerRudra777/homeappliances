@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="450" rx="16" fill="url(#bgGrad)"/>
+  <!-- Outline Box -->
+  <rect x="200" y="110" width="200" height="200" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="4"/>
+  <!-- Appliance Silhouette -->
+  <circle cx="300" cy="180" r="45" fill="none" stroke="#0284c7" stroke-width="6"/>
+  <rect x="230" y="245" width="140" height="12" rx="6" fill="#94a3b8"/>
+  <rect x="260" y="268" width="80" height="8" rx="4" fill="#cbd5e1"/>
+  <!-- Text -->
+  <text x="300" y="345" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="18" font-weight="700" fill="#64748b" text-anchor="middle">VoltCraft Premium Appliance</text>
+  <text x="300" y="370" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="13" font-weight="500" fill="#94a3b8" text-anchor="middle">Energy-Efficient Inverter Engineering</text>
+</svg>

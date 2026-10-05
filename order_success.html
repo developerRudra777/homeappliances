@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Order Confirmed | HomeHub Smart Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Success Confirmation Header -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 text-center mb-4 bg-white">
+        <div class="mb-3">
+            <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center shadow-xs" style="width: 70px; height: 70px;">
+                <i class="bi bi-check2-circle fs-1 text-success"></i>
+            </div>
+        </div>
+        <span class="badge bg-success-subtle text-success small px-3 py-1 rounded-pill fw-bold mx-auto mb-2">
+            &check; Order Confirmed &bull; Payment Received
+        </span>
+        <h2 class="fw-extrabold text-dark mb-1">Thank you, {{ order.first_name }}!</h2>
+        <p class="text-muted small mb-0">
+            Order <strong>#{{ order.order_number }}</strong> has been placed. We've emailed your invoice receipt to <strong>{{ order.email }}</strong>.
+        </p>
+    </div>
+
+    <!-- Stepper & Details Grid (Matching Image 3) -->
+    <div class="row g-4">
+        
+        <!-- Left: Delivery Stepper & Items -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <i class="bi bi-truck text-orange fs-4"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Live delivery tracking</h5>
+                </div>
+
+                <div class="stepper-vertical mb-3">
+                    <div class="stepper-step completed">
+                        <div class="stepper-step-node"><i class="bi bi-check-lg"></i></div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="d-block text-dark small">Order placed</strong>
+                                <span class="text-muted small">Payment confirmed via {{ order.get_payment_method_display }}</span>
+                            </div>
+                            <span class="text-muted small" style="font-size: 0.76rem;">Just Now</span>
+                        </div>
+                    </div>
+
+                    <div class="stepper-step active">
+                        <div class="stepper-step-node">
+                            <div class="rounded-circle bg-white" style="width: 8px; height: 8px;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="d-block text-dark small">Packed at warehouse</strong>
+                                <span class="text-muted small">Fulfillment center preparing appliances</span>
+                            </div>
+                            <span class="text-muted small" style="font-size: 0.76rem;">In Progress</span>
+                        </div>
+                    </div>
+
+                    <div class="stepper-step upcoming">
+                        <div class="stepper-step-node"><i class="bi bi-box-seam"></i></div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="d-block text-dark small">Shipped</strong>
+                                <span class="text-muted small">BlueDart Express Heavy Logistics</span>
+                            </div>
+                            <span class="text-muted small" style="font-size: 0.76rem;">Upcoming</span>
+                        </div>
+                    </div>
+
+                    <div class="stepper-step upcoming">
+                        <div class="stepper-step-node"><i class="bi bi-geo-alt"></i></div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="d-block text-dark small">Out for delivery</strong>
+                                <span class="text-muted small">Delivery agent dispatched</span>
+                            </div>
+                            <span class="text-muted small" style="font-size: 0.76rem;">Upcoming</span>
+                        </div>
+                    </div>
+
+                    <div class="stepper-step upcoming">
+                        <div class="stepper-step-node"><i class="bi bi-house-door"></i></div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="d-block text-dark small">Delivered &amp; Installed</strong>
+                                <span class="text-muted small">Free expert installation</span>
+                            </div>
+                            <span class="text-muted small" style="font-size: 0.76rem;">Within 48 hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-3 bg-orange bg-opacity-10 border border-orange border-opacity-25 d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-orange fs-5"></i>
+                    <span class="small text-dark">
+                        Please keep someone available at home &mdash; installation will be scheduled within 24 hrs of delivery.
+                    </span>
+                </div>
+            </div>
+
+            <!-- Items -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-bag-check text-orange fs-5"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Items in this order</h5>
+                </div>
+                {% for item in order.items.all %}
+                    <div class="d-flex justify-content-between align-items-center gap-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-3 bg-light p-2 border" style="width: 60px; height: 60px;">
+                                <img src="{{ item.product.get_image_url }}" alt="" class="w-100 h-100 object-fit-contain">
+                            </div>
+                            <div>
+                                <strong class="d-block text-dark small">{{ item.product.title }}</strong>
+                                <span class="badge bg-orange bg-opacity-10 text-orange small" style="font-size: 0.68rem;">Free Installation</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted">Qty: {{ item.quantity }}</div>
+                            <strong class="fs-6 text-dark">₹{{ item.total_price|floatformat:0|intcomma }}</strong>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted small py-3">Order items recorded in system.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right: Summary & Address -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-receipt text-orange fs-5"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Price summary</h5>
+                </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Items total</span>
+                    <strong class="text-dark">₹{{ order.subtotal|default:order.total_amount|floatformat:0|intcomma }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Delivery</span>
+                    <strong class="text-success">FREE</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Installation</span>
+                    <strong class="text-success">FREE</strong>
+                </div>
+                <hr class="my-3">
+                <div class="d-flex justify-content-between align-items-baseline mb-3">
+                    <span class="fw-bold fs-5 text-dark">Total paid</span>
+                    <span class="fs-3 fw-extrabold text-orange">₹{{ order.total_amount|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="p-2 rounded-3 bg-success-subtle text-success small fw-bold text-center">
+                    &check; Paid via {{ order.get_payment_method_display }}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-geo-alt text-orange fs-5"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Delivery destination</h5>
+                </div>
+                <strong class="d-block text-dark mb-1">{{ order.full_name }}</strong>
+                <p class="text-muted small mb-2" style="line-height: 1.6;">
+                    {{ order.address_line1 }}<br>
+                    {{ order.city }} &mdash; {{ order.postal_code }}, {{ order.state }}, India
+                </p>
+                <div class="small fw-semibold text-dark">
+                    <i class="bi bi-telephone me-1 text-orange"></i> {{ order.phone }}
+                </div>
+            </div>
+
+            <div class="d-flex flex-column gap-2">
+                <a href="{% url 'orders:order_invoice' order.order_number %}" target="_blank" class="btn btn-outline-dark w-100 fw-bold py-2 rounded-pill">
+                    <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Tax Invoice (PDF)
+                </a>
+                <a href="{% url 'store:home' %}" class="btn btn-primary w-100 fw-bold py-2 rounded-pill">
+                    <i class="bi bi-house-door-fill me-1"></i> Return to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

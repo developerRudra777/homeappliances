@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Explore Appliance Categories | VoltCraft Appliances{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/categories.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none fw-semibold"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Appliance Categories</li>
+        </ol>
+    </nav>
+
+    <!-- Hero Showcase Section -->
+    <div class="categories-hero shadow">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="hero-tag-pill mb-2">
+                    <i class="bi bi-stars me-1"></i> Complete Appliance Hub
+                </span>
+                <h1 class="display-5 fw-extrabold mb-2 text-white">Browse Appliances by Category</h1>
+                <p class="lead mb-3 text-white text-opacity-75 fs-6">
+                    Discover energy-efficient Inverter ACs, Frost-Free Refrigerators, Front-Load Washing Machines, Convection Microwaves, Dishwashers, and Smart Home Living appliances.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-2 text-white text-opacity-90 small">
+                        <i class="bi bi-check-circle-fill text-success fs-6"></i> Free Heavy Delivery &gt; ₹10,000
+                    </div>
+                    <div class="d-flex align-items-center gap-2 text-white text-opacity-90 small">
+                        <i class="bi bi-shield-check text-info fs-6"></i> Up to 10-Yr Motor & Compressor Warranty
+                    </div>
+                    <div class="d-flex align-items-center gap-2 text-white text-opacity-90 small">
+                        <i class="bi bi-tools text-primary fs-6"></i> Standard Installation Within 24-48 Hours
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
+                <div class="bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur d-inline-block text-start border border-white border-opacity-10">
+                    <div class="small text-uppercase fw-bold text-orange mb-1">Store Highlights</div>
+                    <div class="fs-4 fw-bold mb-0 text-white">{{ total_categories }} Categories Ready</div>
+                    <div class="text-light small">Over 1,000+ top brand appliances in stock</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Search & Filter Controls -->
+    <div class="search-filter-box">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="categorySearchInput" class="form-control border-start-0" placeholder="Type category name (e.g. AC, Fridge, Microwave)...">
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="d-flex flex-wrap gap-2 justify-content-md-end" id="categoryFilterPills">
+                    <button type="button" class="cat-pill-btn active" data-filter="all">All Appliances</button>
+                    <button type="button" class="cat-pill-btn" data-filter="ac">Air Conditioners (AC)</button>
+                    <button type="button" class="cat-pill-btn" data-filter="fridge">Refrigerators (Fridge)</button>
+                    <button type="button" class="cat-pill-btn" data-filter="wash">Washing Machines</button>
+                    <button type="button" class="cat-pill-btn" data-filter="kitchen">Kitchen & Cooking</button>
+                    <button type="button" class="cat-pill-btn" data-filter="water">Water & Geysers</button>
+                    <button type="button" class="cat-pill-btn" data-filter="living">TV, Coolers & Living</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="row g-4" id="categoriesGrid">
+        {% for item in categories_data %}
+            {% with cat=item.category count=item.count min_price=item.min_price featured=item.featured_products %}
+                <div class="col-md-6 col-lg-4 category-item-col" 
+                     data-name="{{ cat.name|lower }}" 
+                     data-desc="{{ cat.description|lower }}">
+                    <div class="category-card">
+                        
+                        <!-- Top Image Banner -->
+                        <div class="category-img-wrapper">
+                            <img src="{{ cat.display_image }}" alt="{{ cat.name }}" loading="lazy">
+                            <span class="category-count-badge">
+                                <i class="bi bi-box-seam me-1"></i> {{ count }} Available
+                            </span>
+                            <div class="category-badge-icon">
+                                <i class="bi {{ cat.icon|default:'bi-cpu' }}"></i>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h4 class="fw-extrabold text-dark mb-0">
+                                    <a href="{% url 'store:category_detail' cat.slug %}" class="text-decoration-none text-dark hover-primary">
+                                        {{ cat.name }}
+                                    </a>
+                                </h4>
+                            </div>
+
+                            <p class="text-muted small mb-3 flex-grow-1">
+                                {{ cat.description|default:"Energy-smart modern appliances engineered for superior performance and home comfort."|truncatewords:20 }}
+                            </p>
+
+                            <!-- Feature Tags based on Category -->
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                {% if "condition" in cat.name|lower or "ac" in cat.name|lower %}
+                                    <span class="quick-feature-tag"><i class="bi bi-snow text-primary"></i> Dual Inverter</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-star-fill text-orange"></i> 5-Star Rating</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-shield-check text-success"></i> Copper Coil</span>
+                                {% elif "fridge" in cat.name|lower or "refrigerat" in cat.name|lower %}
+                                    <span class="quick-feature-tag"><i class="bi bi-snow text-primary"></i> Frost Free</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-gear-wide-connected text-primary"></i> Smart Inverter</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-droplet-fill text-info"></i> Twin Cooling</span>
+                                {% elif "wash" in cat.name|lower %}
+                                    <span class="quick-feature-tag"><i class="bi bi-water text-primary"></i> Eco Bubble</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-gear-wide-connected text-dark"></i> Direct Drive</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-shield-fill text-success"></i> Heater Built-in</span>
+                                {% elif "microwave" in cat.name|lower or "oven" in cat.name|lower %}
+                                    <span class="quick-feature-tag"><i class="bi bi-fire text-danger"></i> Convection & Grill</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-check2-circle text-success"></i> Auto Cook Menus</span>
+                                {% elif "dish" in cat.name|lower %}
+                                    <span class="quick-feature-tag"><i class="bi bi-droplet text-info"></i> IntensiveWash</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-soundwave text-secondary"></i> Whisper Quiet</span>
+                                {% else %}
+                                    <span class="quick-feature-tag"><i class="bi bi-award text-primary"></i> High Efficiency</span>
+                                    <span class="quick-feature-tag"><i class="bi bi-shield-check text-success"></i> Brand Warranty</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Starting Price & CTA -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.72rem;">STARTING FROM</small>
+                                    {% if min_price %}
+                                        <span class="fs-5 fw-extrabold text-primary">₹{{ min_price|floatformat:2|intcomma }}</span>
+                                    {% else %}
+                                        <span class="fs-6 fw-bold text-muted">See Models</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'store:category_detail' cat.slug %}" class="btn btn-primary fw-bold px-3 py-2 rounded-3">
+                                    Explore {{ cat.name|truncatewords:2 }} &raquo;
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-folder-x text-muted display-3 mb-3 d-block"></i>
+                <h4 class="fw-bold text-dark">No Categories Available</h4>
+                <p class="text-muted">Explore our full store catalog to find top appliances.</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse Entire Catalog</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- No Match Alert (Hidden by default) -->
+    <div id="noMatchMessage" class="text-center py-5 d-none">
+        <i class="bi bi-search text-muted display-4 mb-2 d-block"></i>
+        <h5 class="fw-bold">No matching categories found</h5>
+        <p class="text-muted small">Try searching for AC, Fridge, Washing Machine, Microwave, or Dishwasher.</p>
+        <button class="btn btn-outline-primary btn-sm" onclick="resetCategorySearch()">Reset Search</button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/categories.js' %}"></script>
+{% endblock %}

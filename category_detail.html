@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ category.name }} | VoltCraft Appliances{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/category_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none fw-semibold"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:categories_list' %}" class="text-decoration-none">Categories</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Dynamic Category Showcase Hero Banner -->
+    <div class="category-banner shadow">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="cat-icon-large">
+                    <i class="bi {{ category.icon|default:'bi-cpu' }}"></i>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <span class="hero-tag-pill">
+                        <i class="bi bi-tag-fill me-1"></i> Dedicated Category
+                    </span>
+                    <span class="badge bg-white bg-opacity-20 text-white px-3 py-1 rounded-pill fw-bold">
+                        {{ total_count }} Model{{ total_count|pluralize }} in Stock
+                    </span>
+                </div>
+                <h1 class="display-5 fw-extrabold mb-2">{{ category.name }}</h1>
+                <p class="lead text-light opacity-90 fs-6 mb-4" style="max-width: 700px;">
+                    {{ category.description|default:"Discover industry-leading appliances designed for extreme energy efficiency, silent performance, and certified long-term durability." }}
+                </p>
+
+                <!-- Assurance Highlights -->
+                <div class="d-flex flex-wrap gap-3 small text-light">
+                    <span><i class="bi bi-shield-check text-info me-1"></i> Up to 10-Yr Motor / Compressor Warranty</span>
+                    <span><i class="bi bi-truck text-success me-1"></i> Free Heavy Delivery &gt; ₹10,000</span>
+                    <span><i class="bi bi-wrench-adjustable-circle text-primary me-1"></i> Certified 24-48 Hr Setup</span>
+                </div>
+            </div>
+
+            <!-- Category Image Card Preview -->
+            <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
+                <div class="bg-white p-2 rounded-4 shadow-lg d-inline-block" style="max-width: 320px;">
+                    <img src="{{ category.display_image }}" alt="{{ category.name }}" class="rounded-3 img-fluid" style="height: 200px; width: 300px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="row g-4">
+
+        <!-- Left Column: Filter Sidebar -->
+        <div class="col-lg-3">
+            <div class="filter-card sticky-top" style="top: 100px;">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-funnel-fill text-primary me-1"></i> Filter {{ category.name }}</h6>
+                    {% if selected_brand or selected_energy_rating or min_price or max_price or query %}
+                        <a href="{% url 'store:category_detail' category.slug %}" class="small text-danger text-decoration-none fw-semibold">
+                            Reset All
+                        </a>
+                    {% endif %}
+                </div>
+
+                <form method="GET" action="{% url 'store:category_detail' category.slug %}">
+                    <!-- Search input inside category -->
+                    <div class="mb-3">
+                        <div class="filter-title">Search in {{ category.name }}</div>
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="q" value="{{ query|default:'' }}" class="form-control" placeholder="Search title, model, sku...">
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Brand Filter -->
+                    {% if brands %}
+                        <div class="mb-4 border-top pt-3">
+                            <div class="filter-title">Appliance Brand</div>
+                            <div class="d-flex flex-column gap-2" style="max-height: 180px; overflow-y: auto;">
+                                <div class="form-check small">
+                                    <input class="form-check-input" type="radio" name="brand" value="" id="brandAll" {% if not selected_brand %}checked{% endif %} onchange="this.form.submit()">
+                                    <label class="form-check-label" for="brandAll">All Brands</label>
+                                </div>
+                                {% for b in brands %}
+                                    <div class="form-check small">
+                                        <input class="form-check-input" type="radio" name="brand" value="{{ b.slug }}" id="brand_{{ b.id }}" {% if selected_brand.slug == b.slug %}checked{% endif %} onchange="this.form.submit()">
+                                        <label class="form-check-label fw-semibold" for="brand_{{ b.id }}">{{ b.name }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Energy Efficiency Rating -->
+                    <div class="mb-4 border-top pt-3">
+                        <div class="filter-title">Energy Rating</div>
+                        <select name="energy_rating" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">All Energy Ratings</option>
+                            <option value="5-Star" {% if selected_energy_rating == '5-Star' %}selected{% endif %}>5-Star Energy Saver</option>
+                            <option value="4-Star" {% if selected_energy_rating == '4-Star' %}selected{% endif %}>4-Star Inverter</option>
+                            <option value="3-Star" {% if selected_energy_rating == '3-Star' %}selected{% endif %}>3-Star Standard</option>
+                            <option value="Inverter" {% if selected_energy_rating == 'Inverter' %}selected{% endif %}>Smart Dual Inverter</option>
+                            <option value="A+++" {% if selected_energy_rating == 'A+++' %}selected{% endif %}>European A+++</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range (in ₹) -->
+                    <div class="mb-4 border-top pt-3">
+                        <div class="filter-title">Price Range (₹)</div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min ₹" value="{{ min_price|default:'' }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max ₹" value="{{ max_price|default:'' }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold">
+                            Filter by Price
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Appliances Grid -->
+        <div class="col-lg-9">
+            
+            <!-- Controls Bar: Item count & Sorting -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2">
+                <span class="text-muted small">
+                    Showing <strong class="text-dark">{{ total_count }}</strong> appliance{{ total_count|pluralize }} in <strong>{{ category.name }}</strong>
+                </span>
+
+                <div class="d-flex align-items-center gap-2">
+                    <label class="small text-muted text-nowrap mb-0">Sort By:</label>
+                    <form method="GET" class="d-inline">
+                        <!-- preserve active filters -->
+                        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                        {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand.slug }}">{% endif %}
+                        {% if selected_energy_rating %}<input type="hidden" name="energy_rating" value="{{ selected_energy_rating }}">{% endif %}
+                        {% if min_price %}<input type="hidden" name="min_price" value="{{ min_price }}">{% endif %}
+                        {% if max_price %}<input type="hidden" name="max_price" value="{{ max_price }}">{% endif %}
+                        
+                        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="featured" {% if sort_by == 'featured' %}selected{% endif %}>Featured Models</option>
+                            <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Latest Releases</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            {% if products %}
+                <div class="row g-3">
+                    {% for prod in products %}
+                        <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 col-6">
+                            {% include 'store/includes/product_card.html' with product=prod %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                    <nav class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if selected_energy_rating %}&energy_rating={{ selected_energy_rating }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                                        &laquo; Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if selected_energy_rating %}&energy_rating={{ selected_energy_rating }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if selected_energy_rating %}&energy_rating={{ selected_energy_rating }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                                        Next &raquo;
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+
+            {% else %}
+                <!-- Empty Category State -->
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4 bg-light">
+                    <div class="display-3 text-muted mb-3">
+                        <i class="bi {{ category.icon|default:'bi-box-seam' }}"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">No Appliances Found in {{ category.name }}</h4>
+                    <p class="text-muted small mb-4">
+                        {% if query or selected_brand or min_price or max_price %}
+                            No appliances matched your current filter criteria. Try resetting your filters.
+                        {% else %}
+                            We are restocking appliances for {{ category.name }}. Please check back shortly or explore our full catalog.
+                        {% endif %}
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'store:category_detail' category.slug %}" class="btn btn-outline-primary">
+                            Reset Filters
+                        </a>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+                            Browse Entire Catalog
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Quick Switch to Other Categories -->
+    <div class="mt-5 pt-4 border-top">
+        <h5 class="fw-bold mb-3"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i> Explore Other Categories</h5>
+        <div class="d-flex flex-wrap gap-2">
+            {% for other_cat in all_categories %}
+                <a href="{% url 'store:category_detail' other_cat.slug %}" class="other-cat-chip {% if other_cat.id == category.id %}active{% endif %}">
+                    <i class="bi {{ other_cat.icon|default:'bi-cpu' }}"></i>
+                    <span>{{ other_cat.name }}</span>
+                    <span class="badge bg-light text-dark border">{{ other_cat.products.count }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

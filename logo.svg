@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 54" width="220" height="54">
+  <defs>
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+  </defs>
+  <!-- Modern House / Roof Icon -->
+  <g transform="translate(6, 7)">
+    <!-- Roof outline -->
+    <path d="M20 4L4 18H9V34H31V18H36L20 4Z" fill="none" stroke="url(#roofGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Smart Window 4-grid -->
+    <rect x="15" y="19" width="4.5" height="4.5" rx="1" fill="#ea580c"/>
+    <rect x="21" y="19" width="4.5" height="4.5" rx="1" fill="#ea580c"/>
+    <rect x="15" y="25" width="4.5" height="4.5" rx="1" fill="#ea580c"/>
+    <rect x="21" y="25" width="4.5" height="4.5" rx="1" fill="#ea580c"/>
+    <!-- Door / Foundation accent -->
+    <path d="M12 34H28" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Brand Typography -->
+  <text x="56" y="30" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#111111" letter-spacing="-0.5">Home<tspan fill="#ea580c">Hub</tspan></text>
+  <text x="57" y="44" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#78716c" letter-spacing="0.5">LIVE BETTER. LIVE SMART.</text>
+</svg>

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found (404) | HomeHub Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="p-5 bg-white rounded-4 shadow-sm border">
+                <div class="display-1 fw-bold text-orange mb-3">404</div>
+                <h3 class="fw-bold mb-3">Appliance Page Not Found</h3>
+                <p class="text-muted mb-4">
+                    The page or product you are looking for might have been moved, removed, or the link is incorrect.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'store:home' %}" class="btn btn-primary px-4 py-2 fw-semibold">
+                        <i class="bi bi-house-door me-1"></i> Back to Home
+                    </a>
+                    <a href="{% url 'store:product_list' %}" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+                        <i class="bi bi-grid me-1"></i> Browse Catalog
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

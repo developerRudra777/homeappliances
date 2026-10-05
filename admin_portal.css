@@ -1,0 +1,554 @@
+/* ==========================================================================
+   HomeHub Custom Admin Portal Stylesheet (admin_portal.css)
+   Theme: Fresh Lime Green (#65A30D) + Clean Crisp White (#FFFFFF)
+   ========================================================================== */
+
+:root {
+    --portal-bg: #F8FAF6;              /* Fresh light canvas with subtle lime undertone */
+    --portal-sidebar-bg: #111713;      /* Deep obsidian charcoal with eco-tint */
+    --portal-primary: #65A30D;         /* Vibrant, accessible Lime Green */
+    --portal-primary-hover: #4D7C0F;   /* Darker rich lime for hover states */
+    --portal-primary-light: #F7FEE7;   /* Ultra-soft lime tint for cards and badges */
+    --portal-primary-subtle: #ECFCCB;  /* Soft pastel lime green */
+    --portal-card-bg: #FFFFFF;         /* Crisp White */
+    --portal-border: #E5ECE0;          /* Subtle light green-gray border */
+    --portal-text-dark: #111814;       /* Deep high-contrast dark text */
+    --portal-text-muted: #64748B;      /* Balanced neutral muted text */
+    --portal-active-pill: #ECFCCB;     /* Active nav item background */
+}
+
+body.portal-body-wrapper {
+    background-color: var(--portal-bg);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--portal-text-dark);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   Dark Sidebar Navigation (#111713)
+   ========================================================================== */
+.portal-sidebar {
+    width: 240px;
+    background-color: var(--portal-sidebar-bg);
+    color: #A1A1AA;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 20px 14px;
+    border-right: 1px solid #1F2E23;
+    min-height: 100vh;
+}
+
+.portal-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none !important;
+    padding: 8px 10px 24px 10px;
+}
+
+.portal-brand-roof-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--portal-primary);
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.portal-sidebar-brand h5 {
+    color: #FFFFFF;
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.portal-sidebar-brand span.brand-sub {
+    color: #84CC16;
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: block;
+}
+
+.portal-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.portal-nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    color: #94A3B8;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.15s ease;
+}
+
+.portal-nav-item a:hover {
+    color: #FFFFFF;
+    background-color: #1A261E;
+}
+
+/* Active Menu Item: Fresh Lime Tint Pill with Dark Text */
+.portal-nav-item a.active {
+    background-color: var(--portal-active-pill);
+    color: #1A2E05 !important;
+    font-weight: 700;
+}
+
+.portal-nav-item a.active i {
+    color: var(--portal-primary);
+}
+
+.portal-nav-item a i {
+    font-size: 1.15rem;
+    width: 20px;
+    text-align: center;
+}
+
+.portal-sidebar-footer {
+    padding-top: 20px;
+    border-top: 1px solid #1F2E23;
+}
+
+.portal-sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #A1A1AA;
+    text-decoration: none !important;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: color 0.15s ease;
+}
+
+.portal-sidebar-logout:hover {
+    color: #EF4444;
+}
+
+.portal-subtagline {
+    font-size: 0.72rem;
+    color: #64748B;
+    padding: 12px 12px 0 12px;
+}
+
+/* ==========================================================================
+   Main Portal Content Area
+   ========================================================================== */
+.portal-main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    min-width: 0;
+}
+
+/* Top Header Bar */
+.portal-topbar {
+    background-color: var(--portal-bg);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.portal-search-box {
+    max-width: 580px;
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid var(--portal-border);
+    border-radius: 9999px;
+    padding: 6px 6px 6px 18px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.portal-search-box input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.88rem;
+    flex: 1;
+    color: var(--portal-text-dark);
+}
+
+.portal-search-box button {
+    background-color: #111814;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 9999px;
+    padding: 7px 22px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.portal-search-box button:hover {
+    background-color: var(--portal-primary);
+}
+
+.portal-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.portal-notif-btn {
+    position: relative;
+    background-color: #FFFFFF;
+    border: 1px solid var(--portal-border);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111814;
+    font-size: 1.15rem;
+    text-decoration: none !important;
+    transition: border-color 0.2s ease;
+}
+
+.portal-notif-btn:hover {
+    border-color: var(--portal-primary);
+    color: var(--portal-primary);
+}
+
+.portal-notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: var(--portal-primary);
+    color: #FFFFFF;
+    font-size: 0.65rem;
+    font-weight: 800;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FFFFFF;
+}
+
+.portal-admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.portal-admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--portal-primary-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #365314;
+    font-size: 1rem;
+    border: 2px solid #D9F99D;
+}
+
+.portal-admin-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--portal-text-dark);
+    line-height: 1.2;
+}
+
+.portal-admin-role {
+    font-size: 0.72rem;
+    color: var(--portal-text-muted);
+}
+
+/* ==========================================================================
+   Dashboard Canvas & Cards
+   ========================================================================== */
+.portal-content-body {
+    padding: 0 32px 40px 32px;
+}
+
+.portal-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.portal-page-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #111814;
+    margin-bottom: 4px;
+}
+
+.portal-page-subtitle {
+    font-size: 0.88rem;
+    color: var(--portal-text-muted);
+    margin: 0;
+}
+
+.portal-date-pill {
+    background-color: #FFFFFF;
+    border: 1px solid var(--portal-border);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #111814;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.portal-date-pill i {
+    color: var(--portal-primary);
+}
+
+/* 6 Top Metric Cards */
+.portal-metric-card {
+    background-color: #FFFFFF;
+    border: 1px solid var(--portal-border);
+    border-radius: 16px;
+    padding: 18px 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    height: 100%;
+}
+
+.portal-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(101, 163, 13, 0.12);
+    border-color: #BEF264;
+}
+
+.metric-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.metric-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background-color: var(--portal-primary-light);
+    border: 1px solid #D9F99D;
+    color: var(--portal-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.metric-title {
+    font-size: 0.8rem;
+    color: var(--portal-text-muted);
+    font-weight: 600;
+}
+
+.metric-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #111814;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.metric-trend-up {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #16A34A;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.metric-trend-down {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #DC2626;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.metric-link-action {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--portal-primary);
+    text-decoration: none !important;
+}
+
+.metric-link-action:hover {
+    color: var(--portal-primary-hover);
+    text-decoration: underline !important;
+}
+
+/* Middle / Bottom Cards */
+.portal-card-box {
+    background-color: #FFFFFF;
+    border: 1px solid var(--portal-border);
+    border-radius: 18px;
+    padding: 22px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.portal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.portal-card-header h5 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #111814;
+    margin: 0;
+}
+
+.portal-card-header a {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--portal-primary);
+    text-decoration: none !important;
+}
+
+.portal-card-header a:hover {
+    color: var(--portal-primary-hover);
+}
+
+/* Donut Chart Legend */
+.donut-legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    padding: 5px 0;
+}
+
+.donut-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Top Selling Product Item */
+.top-product-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid #F1F5F0;
+}
+
+.top-product-item:last-child {
+    border-bottom: none;
+}
+
+.top-product-item img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    background-color: #F8FAF6;
+    border: 1px solid var(--portal-border);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+/* Recent Orders Table */
+.portal-orders-table {
+    width: 100%;
+    font-size: 0.82rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.portal-orders-table th {
+    background-color: transparent;
+    color: var(--portal-text-muted);
+    font-weight: 700;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--portal-border);
+}
+
+.portal-orders-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #F1F5F0;
+    vertical-align: middle;
+}
+
+.portal-orders-table tr:hover td {
+    background-color: #F8FAF6;
+}
+
+/* Status Badges */
+.badge-portal-status {
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-portal-delivered { background-color: #ECFCCB; color: #365314; border: 1px solid #D9F99D; }
+.badge-portal-processing { background-color: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+.badge-portal-shipped { background-color: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+.badge-portal-pending { background-color: #F3F4F6; color: #374151; border: 1px solid #E5E7EB; }
+
+/* Order Status Badge Classes (Uppercase & Lowercase) */
+.badge-status-PENDING, .badge-status-pending { background-color: #FEF3C7 !important; color: #B45309 !important; border: 1px solid #FDE68A !important; }
+.badge-status-CONFIRMED, .badge-status-confirmed { background-color: #E0F2FE !important; color: #0369A1 !important; border: 1px solid #BAE6FD !important; }
+.badge-status-SHIPPED, .badge-status-shipped { background-color: #DBEAFE !important; color: #1D4ED8 !important; border: 1px solid #BFDBFE !important; }
+.badge-status-DELIVERED, .badge-status-delivered { background-color: #ECFCCB !important; color: #365314 !important; border: 1px solid #D9F99D !important; }
+.badge-status-CANCELLED, .badge-status-cancelled { background-color: #FEE2E2 !important; color: #B91C1C !important; border: 1px solid #FECACA !important; }
+
+/* Promotional Offer Card (Bottom-Right) */
+.portal-promo-card {
+    background-color: var(--portal-primary-light);
+    border: 1px solid #D9F99D;
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.portal-special-tag {
+    background-color: var(--portal-primary);
+    color: #FFFFFF;
+    font-size: 0.68rem;
+    font-weight: 800;
+    border-radius: 6px;
+    padding: 3px 8px;
+    display: inline-block;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 6px rgba(101, 163, 13, 0.25);
+}

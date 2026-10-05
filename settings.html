@@ -1,0 +1,83 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}Store Settings | VoltCraft Administration{% endblock %}
+
+{% block portal_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="portal-card p-4 p-md-5">
+            <div class="d-flex align-items-center gap-3 mb-4 border-bottom pb-3">
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-sliders"></i>
+                </div>
+                <div>
+                    <h4 class="fw-extrabold mb-1">⚙️ Store Operational Settings</h4>
+                    <p class="text-muted small mb-0">Configure store branding, support contacts, and shipping threshold rules</p>
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <h6 class="fw-bold mb-3 text-primary">1. Brand & Contact Information</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Store Business Name *</label>
+                        {{ form.store_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Tagline</label>
+                        {{ form.tagline }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Support Email Address</label>
+                        {{ form.support_email }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Helpline Phone Number</label>
+                        {{ form.support_phone }}
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3 text-primary">2. Currency & Shipping Rules</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Currency Symbol</label>
+                        {{ form.currency_symbol }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Free Shipping Threshold (₹)</label>
+                        {{ form.free_shipping_threshold }}
+                        <small class="text-muted">Orders above this get free delivery</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Standard Delivery Fee (₹)</label>
+                        {{ form.standard_shipping_fee }}
+                        <small class="text-muted">Charged on orders below threshold</small>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3 text-primary">3. System & Maintenance Mode</h6>
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <div class="form-check mb-2">
+                        {{ form.order_email_notifications }}
+                        <label class="form-check-label small fw-bold" for="{{ form.order_email_notifications.id_for_label }}">
+                            Send automated confirmation emails for new orders
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        {{ form.maintenance_mode }}
+                        <label class="form-check-label small fw-bold text-danger" for="{{ form.maintenance_mode.id_for_label }}">
+                            Enable Store Maintenance Mode (Restricts public access)
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow">
+                    <i class="bi bi-check2-circle me-1"></i> Save Store Settings
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

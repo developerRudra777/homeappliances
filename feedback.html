@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Customer Feedback & Reviews | HomeHub Appliances{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-decoration-none fw-semibold"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Customer Feedback</li>
+        </ol>
+    </nav>
+
+    <!-- Header Banner -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-2">
+                    <i class="bi bi-chat-heart-fill me-1"></i> Verified Customer Voices
+                </span>
+                <h1 class="fw-extrabold display-6 mb-2">Customer Feedback & Reviews</h1>
+                <p class="text-light opacity-75 mb-0" style="max-width: 600px;">
+                    We are dedicated to providing the best home appliances and service. Read what our real customers have to say or share your own experience with us!
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="#feedback-form-card" class="btn btn-warning btn-lg px-4 fw-bold rounded-pill shadow-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Give Feedback
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Summary Metric Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center h-100">
+                <div class="display-4 fw-extrabold text-dark mb-1">{{ avg_rating }}<small class="fs-4 text-muted">/5</small></div>
+                <div class="text-warning mb-2 fs-5">
+                    {% for i in "12345" %}
+                        <i class="bi bi-star-fill"></i>
+                    {% endfor %}
+                </div>
+                <span class="text-muted small">Overall Customer Satisfaction across <strong>{{ total_count }}</strong> verified reviews</span>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                <h6 class="fw-bold text-dark mb-3">Rating Breakdown</h6>
+                <div class="d-flex flex-column gap-2">
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span style="width: 60px;">5 Stars</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {% if total_count %}{% widthratio rating_counts.5 total_count 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                        <span class="text-muted" style="width: 40px; text-align: right;">{{ rating_counts.5 }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span style="width: 60px;">4 Stars</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: {% if total_count %}{% widthratio rating_counts.4 total_count 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                        <span class="text-muted" style="width: 40px; text-align: right;">{{ rating_counts.4 }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span style="width: 60px;">3 Stars</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: {% if total_count %}{% widthratio rating_counts.3 total_count 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                        <span class="text-muted" style="width: 40px; text-align: right;">{{ rating_counts.3 }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span style="width: 60px;">2 Stars</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: {% if total_count %}{% widthratio rating_counts.2 total_count 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                        <span class="text-muted" style="width: 40px; text-align: right;">{{ rating_counts.2 }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span style="width: 60px;">1 Star</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar bg-danger" style="width: {% if total_count %}{% widthratio rating_counts.1 total_count 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                        <span class="text-muted" style="width: 40px; text-align: right;">{{ rating_counts.1 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Left = Customer Reviews List, Right = Feedback Form -->
+    <div class="row g-4">
+        <!-- Customer Feedbacks Stream -->
+        <div class="col-lg-7">
+            <!-- Filter Tabs -->
+            <div class="d-flex gap-2 flex-wrap mb-3">
+                <a href="{% url 'store:customer_feedback' %}" class="btn btn-sm {% if not selected_rating %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+                    All ({{ total_count }})
+                </a>
+                <a href="{% url 'store:customer_feedback' %}?rating=5" class="btn btn-sm {% if selected_rating == '5' %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+                    ★★★★★ 5-Star
+                </a>
+                <a href="{% url 'store:customer_feedback' %}?rating=4" class="btn btn-sm {% if selected_rating == '4' %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+                    ★★★★ 4-Star
+                </a>
+                <a href="{% url 'store:customer_feedback' %}?rating=3" class="btn btn-sm {% if selected_rating == '3' %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} rounded-pill fw-semibold px-3">
+                    ★★★ 3-Star
+                </a>
+            </div>
+
+            <!-- Feedback Cards List -->
+            {% for item in feedbacks %}
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                {{ item.name|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <strong class="d-block text-dark">{{ item.name }}</strong>
+                                <span class="badge bg-light text-secondary border small" style="font-size: 0.72rem;">{{ item.get_feedback_type_display }}</span>
+                                {% if item.order_number %}
+                                    <span class="badge bg-success-subtle text-success small" style="font-size: 0.72rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified Buyer ({{ item.order_number }})</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="text-muted small">{{ item.created_at|date:"M d, Y" }}</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <span class="text-warning small me-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= item.rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <strong class="text-dark">{{ item.subject }}</strong>
+                    </div>
+
+                    <p class="text-secondary small mb-2" style="line-height: 1.6;">
+                        {{ item.message|linebreaksbr }}
+                    </p>
+
+                    <!-- Official Admin Reply if present -->
+                    {% if item.admin_reply %}
+                        <div class="mt-3 p-3 bg-light rounded-3 border-start border-4 border-primary">
+                            <div class="d-flex align-items-center gap-1 mb-1 small fw-bold text-primary">
+                                <i class="bi bi-shield-check"></i> HomeHub Support Team Response:
+                            </div>
+                            <p class="small text-dark mb-0">{{ item.admin_reply }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-3">
+                    <div class="display-3 text-muted mb-2"><i class="bi bi-chat-square-heart"></i></div>
+                    <h5 class="fw-bold">No feedback yet in this category</h5>
+                    <p class="text-muted small">Be the first to share your thoughts using the form on the right.</p>
+                </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}">&laquo; Prev</a></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}">Next &raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+
+        <!-- Submit Feedback Form (Right Column) -->
+        <div class="col-lg-5" id="feedback-form-card">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 90px;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0 text-dark">Share Your Experience</h5>
+                </div>
+                <p class="text-muted small mb-4">Your honest feedback helps us improve appliance quality and delivery services.</p>
+
+                <form method="POST" action="{% url 'store:customer_feedback' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Overall Rating <span class="text-danger">*</span></label>
+                        {{ form.rating }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Feedback Type <span class="text-danger">*</span></label>
+                        {{ form.feedback_type }}
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Your Name <span class="text-danger">*</span></label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Email <span class="text-danger">*</span></label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Phone (Optional)</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Order ID (Optional)</label>
+                            {{ form.order_number }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Subject / Title <span class="text-danger">*</span></label>
+                        {{ form.subject }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Detailed Feedback <span class="text-danger">*</span></label>
+                        {{ form.message }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill shadow-sm">
+                        <i class="bi bi-send-fill me-1"></i> Submit Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
